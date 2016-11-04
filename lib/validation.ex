@@ -1,0 +1,2 @@
+defmodule Validation do
+end
