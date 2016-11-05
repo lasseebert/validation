@@ -17,11 +17,7 @@ defmodule Validation.Predicates do
   def type?(_value, :string), do: false
 
   def match?(value, pattern) when is_binary(value) do
-    if pattern |> Regex.regex? do
-      value |> String.match?(pattern)
-    else
-      false
-    end
+    value |> String.match?(pattern)
   end
   def match?(_, _) do
     false
