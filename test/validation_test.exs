@@ -11,8 +11,8 @@ defmodule ValidationTest do
 
   def name_email_schema do
     Validation.schema do
-      optional(:name, filled? and string?)
-      required(:email, filled? and string? and match?(~r/@/))
+      optional(:name, filled? and type?(:string))
+      required(:email, filled? and type?(:string) and match?(~r/@/))
     end
   end
 
@@ -29,8 +29,19 @@ defmodule ValidationTest do
     assert Result.valid?(result) == true
   end
 
-  @tag :skip
-  test "basic usage with invalid params"
+  test "basic usage with invalid params" do
+    params = %{
+      name: "Derp",
+      email: "Derp"
+    }
+
+    result = Validation.result(params, name_email_schema)
+
+    assert result.errors == %{email: ["is invalid"]}
+    assert result.data == %{name: "Derp", email: "Derp"}
+    assert Result.valid?(result) == false
+  end
+
   @tag :skip
   test "whitelisting params"
   @tag :skip

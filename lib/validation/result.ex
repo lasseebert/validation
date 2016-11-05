@@ -18,4 +18,11 @@ defmodule Validation.Result do
   def put_data(result, key, value) do
     %{result | data: Map.put(result.data, key, value)}
   end
+
+  @doc """
+  Adds an error to a specific key
+  """
+  def put_error(result, key, message) do
+    %{result | errors: Map.update(result.errors, key, [message], fn errors -> [message | errors] end)}
+  end
 end
