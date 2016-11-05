@@ -15,12 +15,10 @@ defmodule Validation do
     end
   end
 
-  def result(params, _schema) do
-    # Dummy for now
-    %{
-      errors: %{},
-      valid?: true,
-      data: params
-    }
+  @doc """
+  Shorthand for Validation.Validator.result/2
+  """
+  def result(params, schema) do
+    Validation.Validator.result(params, schema)
   end
 end

@@ -5,6 +5,8 @@ defmodule ValidationTest do
   """
 
   use ExUnit.Case, async: true
+
+  alias Validation.Result
   require Validation
 
   def name_email_schema do
@@ -14,18 +16,17 @@ defmodule ValidationTest do
     end
   end
 
-  @tag :skip
   test "basic usage with valid params" do
     params = %{
-      "name" => "Chuck Norris",
-      "email" => "gmail@chucknorris.com"
+      name: "Chuck Norris",
+      email: "gmail@chucknorris.com"
     }
 
     result = Validation.result(params, name_email_schema)
 
     assert result.errors == %{}
-    assert result.valid? == true
     assert result.data == %{name: "Chuck Norris", email: "gmail@chucknorris.com"}
+    assert Result.valid?(result) == true
   end
 
   @tag :skip
