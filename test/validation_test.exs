@@ -42,8 +42,19 @@ defmodule ValidationTest do
     assert Result.valid?(result) == false
   end
 
-  @tag :skip
-  test "whitelisting params"
+  test "whitelisting params" do
+    params = %{
+      name: "Chuck Norris",
+      email: "gmail@chucknorris.com",
+      other: "thing"
+    }
+
+    result = Validation.result(params, name_email_schema)
+
+    assert result.errors == %{}
+    assert result.data == %{name: "Chuck Norris", email: "gmail@chucknorris.com"}
+  end
+
   @tag :skip
   test "optional params"
 end

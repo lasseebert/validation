@@ -27,10 +27,15 @@ defmodule Validation.Validator do
           result
           |> Result.put_data(key, value)
           |> Result.put_error(key, message)
+        :no_rule ->
+          result
       end
     end)
   end
 
+  defp validate_param(_value, nil) do
+    :no_rule
+  end
   defp validate_param(value, rule) do
     validate_predicate(value, rule.value_predicates)
   end
