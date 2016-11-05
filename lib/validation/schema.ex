@@ -28,11 +28,7 @@ defmodule Validation.Schema do
   end
 
   defp define_quoted(quoted_rules) do
-    rules =
-      quoted_rules
-      |> build_rules
-
-    %Validation.Schema{rules: rules}
+    %Validation.Schema{rules: build_rules(quoted_rules)}
     |> Macro.escape
   end
 
