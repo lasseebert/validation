@@ -34,14 +34,15 @@ defmodule Validation.SchemaTest do
     assert rule_2.field == :last_name
   end
 
-  @tag :skip
   test "using predicate functions with parameters" do
     schema = Schema.define do
       required(:email, match(~r/@/))
     end
 
-    assert schema.rules.email.field == :email
-    assert schema.rules.email.key_rule == :required
-    assert schema.rules.email.value_predicates == {:match, [~r/@/]}
+    rule = schema.rules |> hd
+
+    assert rule.field == :email
+    assert rule.key_rule == :required
+    assert rule.value_predicates == {:match, [~r/@/]}
   end
 end

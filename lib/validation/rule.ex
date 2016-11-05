@@ -25,13 +25,14 @@ defmodule Validation.Rule do
   end
 
   # Predicate function with no arguments
-  defp build_predicates({predicate_fun, _, nil}) do
+  defp build_predicates({predicate_fun, _, atom}) when atom |> is_atom do
     {predicate_fun, []}
   end
 
   # Predicate function with arguments
-  defp build_predicates({predicate_fun, _, args}) do
-    {predicate_fun, args}
+  defp build_predicates({predicate_fun, _, args}) when args |> is_list do
+    {evaluated_args, _} = Code.eval_quoted(args)
+    {predicate_fun, evaluated_args}
   end
 end
 

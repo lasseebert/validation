@@ -31,11 +31,9 @@ defmodule Validation.Schema do
     rules =
       quoted_rules
       |> build_rules
-      |> Macro.escape
 
-    quote do
-      %Validation.Schema{rules: unquote(rules)}
-    end
+    %Validation.Schema{rules: rules}
+    |> Macro.escape
   end
 
   defp build_rules([]) do
