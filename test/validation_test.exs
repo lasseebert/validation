@@ -55,6 +55,25 @@ defmodule ValidationTest do
     assert result.data == %{name: "Chuck Norris", email: "gmail@chucknorris.com"}
   end
 
-  @tag :skip
-  test "optional params"
+  test "missing required params" do
+    params = %{
+      name: "Derp With No Email"
+    }
+
+    result = Validation.result(params, name_email_schema)
+
+    assert result.errors == %{email: ["is missing"]}
+    assert result.data == %{name: "Derp With No Email"}
+  end
+
+  test "missing optional params" do
+    params = %{
+      email: "noname@example.com"
+    }
+
+    result = Validation.result(params, name_email_schema)
+
+    assert result.errors == %{}
+    assert result.data == %{email: "noname@example.com"}
+  end
 end

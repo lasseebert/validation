@@ -16,9 +16,30 @@ defmodule Validation.Validator do
       |> Enum.map(&({&1.field, &1}))
       |> Enum.into(%{})
 
+    %Result{}
+    |> validate_keys(params, schema.rules)
+    |> validate_values(params, rule_map)
+  end
+
+  defp validate_keys(result, params, rules) do
+    rules
+    |> Enum.reduce(result, fn
+        %{key_rule: :optional}, result ->
+          result
+        rule, result ->
+          if Map.has_key?(params, rule.field) do
+            result
+          else
+            result
+            |> Result.put_error(rule.field, "is missing")
+          end
+    end)
+  end
+
+  defp validate_values(result, params, rule_map) do
     params
     |> Enum.into([])
-    |> Enum.reduce(%Result{}, fn {key, value}, result ->
+    |> Enum.reduce(result, fn {key, value}, result ->
       case validate_param(value, Map.get(rule_map, key)) do
         :ok ->
           result
