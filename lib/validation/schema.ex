@@ -38,12 +38,11 @@ defmodule Validation.Schema do
     end
   end
 
-  defp build_rules(quoted_rules) do
-    quoted_rules
-    |> Enum.reduce(%{}, fn quoted_rule, rule_map ->
-      rule = Rule.build_rule(quoted_rule)
-      Map.put(rule_map, rule.field, rule)
-    end)
+  defp build_rules([]) do
+    []
   end
-
+  defp build_rules([quoted_rule | rest]) do
+    rule = Rule.build_rule(quoted_rule)
+    [rule | build_rules(rest)]
+  end
 end

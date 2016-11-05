@@ -9,11 +9,12 @@ defmodule Validation.SchemaTest do
       optional(:name, filled and string)
     end
 
-    rules = schema.rules
+    assert schema.rules |> length == 1
 
-    assert rules.name.field == :name
-    assert rules.name.key_rule == :optional
-    assert rules.name.value_predicates == {
+    rule = schema.rules |> hd
+    assert rule.field == :name
+    assert rule.key_rule == :optional
+    assert rule.value_predicates == {
       :and,
       {:filled, []},
       {:string, []}
@@ -26,8 +27,11 @@ defmodule Validation.SchemaTest do
       required(:last_name, filled and string)
     end
 
-    assert schema.rules.first_name
-    assert schema.rules.last_name
+    assert schema.rules |> length == 2
+
+    [rule_1, rule_2] = schema.rules
+    assert rule_1.field == :first_name
+    assert rule_2.field == :last_name
   end
 
   @tag :skip
