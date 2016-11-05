@@ -9,8 +9,8 @@ defmodule ValidationTest do
 
   def name_email_schema do
     Validation.schema do
-      optional(:name, filled and string)
-      required(:email, filled and string and match(~r/@/))
+      optional(:name, filled? and string?)
+      required(:email, filled? and string? and match?(~r/@/))
     end
   end
 
