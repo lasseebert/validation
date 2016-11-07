@@ -1,8 +1,8 @@
 # Validation
 
-Temp repo for a validation library in Elixir inspired by [dry-validation](http://dry-rb.org/gems/dry-validation/).
+Validation library in Elixir inspired by [dry-validation](http://dry-rb.org/gems/dry-validation/).
 
-The name is probably also temporary.
+This is a WIP and the name of the library may change.
 
 ## Installation
 
