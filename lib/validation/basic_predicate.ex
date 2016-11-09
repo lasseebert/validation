@@ -22,17 +22,15 @@ defmodule Validation.BasicPredicate do
       meta: meta
     }
   end
+end
 
-  @doc """
-  Compiles the predicate into a function that accepts a single argument
-  and returns either :ok or {:error, message}
-  """
-  def compile(%__MODULE__{} = predicate) do
+defimpl Validation.Validator, for: Validation.BasicPredicate do
+  def compile(basic) do
     fn value ->
-      if predicate.fun.(value) do
+      if basic.fun.(value) do
         :ok
       else
-        {:error, predicate.message}
+        {:error, basic.message}
       end
     end
   end

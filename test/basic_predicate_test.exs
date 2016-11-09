@@ -2,6 +2,7 @@ defmodule Validation.BasicPredicateTest do
   use ExUnit.Case, async: true
 
   alias Validation.BasicPredicate
+  alias Validation.Validator
 
   test "a simple empty? predicate" do
     fun = fn value -> value in [nil, ""] end
@@ -14,7 +15,7 @@ defmodule Validation.BasicPredicateTest do
     assert predicate.message == message
     assert predicate.meta |> Keyword.get(:name) == name
 
-    compiled = BasicPredicate.compile(predicate)
+    compiled = Validator.compile(predicate)
 
     assert compiled.("") == :ok
     assert compiled.("foo") == {:error, "must be empty"}
