@@ -1,13 +1,13 @@
-defmodule Validation.Predicate do
+defmodule Validation.BasicPredicate do
   @moduledoc """
-  A compiled predicate takes a single value as input and returns either
-  :ok or {:error, message}.
+  The most basic form of predicates.
+  This is the building block of other predicates
   """
 
   defstruct [
-    name: nil,
     fun: nil,
-    message: nil
+    message: nil,
+    meta: []
   ]
 
   @doc """
@@ -15,16 +15,16 @@ defmodule Validation.Predicate do
 
   The given fun should return true or false when given a single input
   """
-  def build(name, fun, message) do
+  def build(fun, message, meta \\ []) do
     %__MODULE__{
-      name: name,
       fun: fun,
-      message: message
+      message: message,
+      meta: meta
     }
   end
 
   @doc """
-  Compiled the predicate into a function that accepts a single value argument
+  Compiles the predicate into a function that accepts a single argument
   and returns either :ok or {:error, message}
   """
   def compile(%__MODULE__{} = predicate) do
