@@ -27,4 +27,16 @@ defmodule Validation.ComposedPredicateTest do
     assert compiled.(42) == {:error, "must be a string"}
     assert compiled.("foo") == :ok
   end
+
+  test "building an and-predicate with the built-in helper function" do
+    filled? = BasicPredicate.build(fn value -> !(value in ["", nil]) end, "must be filled", [name: "filled?"])
+    string? = BasicPredicate.build(&is_binary/1, "must be a string", [name: "string?"])
+
+    composed = ComposedPredicate.build_and(filled?, string?)
+    compiled = Validator.compile(composed)
+
+    assert compiled.("") == {:error, "must be filled"}
+    assert compiled.(42) == {:error, "must be a string"}
+    assert compiled.("foo") == :ok
+  end
 end
