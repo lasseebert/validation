@@ -1,13 +1,12 @@
 defmodule Validation.RuleTest do
   use ExUnit.Case, async: true
 
-  alias Validation.BasicPredicate
+  alias Validation.Predicate
   alias Validation.Result
   alias Validation.Rule
-  alias Validation.Validator
 
   test "building a simple custom rule" do
-    fun = fn result ->
+    val = fn result ->
       if result.data[:name] do
         result
       else
@@ -15,39 +14,33 @@ defmodule Validation.RuleTest do
       end
     end
 
-    rule = Rule.build(fun, name: ["name must be filled"])
+    rule = Rule.build(val, name: ["name must be filled"])
 
-    compiled = Validator.compile(rule)
-
-    result = %Result{data: %{name: "Me"}} |> compiled.()
+    result = %Result{data: %{name: "Me"}} |> rule.val.()
     assert result.errors == %{}
 
-    result = %Result{data: %{}} |> compiled.()
+    result = %Result{data: %{}} |> rule.val.()
     assert result.errors == %{name: ["must be filled"]}
   end
 
   test "building a value rule" do
-    filled? = BasicPredicate.build(fn value -> !(value in ["", nil]) end, "must be filled", [name: "filled?"])
+    filled? = Predicate.build_basic(fn value -> !(value in ["", nil]) end, "must be filled", "filled?")
     rule = Rule.build_value_rule(:name, filled?)
 
-    compiled = Validator.compile(rule)
-
-    result = %Result{data: %{name: "Me"}} |> compiled.()
+    result = %Result{data: %{name: "Me"}} |> rule.val.()
     assert result.errors == %{}
 
-    result = %Result{data: %{}} |> compiled.()
+    result = %Result{data: %{}} |> rule.val.()
     assert result.errors == %{name: ["must be filled"]}
   end
 
   test "building a required key rule" do
     rule = Rule.build_required_key(:name)
 
-    compiled = Validator.compile(rule)
-
-    result = %Result{data: %{name: "Me"}} |> compiled.()
+    result = %Result{data: %{name: "Me"}} |> rule.val.()
     assert result.errors == %{}
 
-    result = %Result{data: %{}} |> compiled.()
+    result = %Result{data: %{}} |> rule.val.()
     assert result.errors == %{name: ["is missing"]}
   end
 end
