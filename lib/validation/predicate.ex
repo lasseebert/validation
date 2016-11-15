@@ -43,9 +43,9 @@ defmodule Validation.Predicate do
   end
 
   @doc """
-  Builds a predicate composed by two other predicates with and
+  Built-in and
   """
-  def build_and(left, right) do
+  def built_in("and", left, right) do
     composer = fn [left, right] ->
       fn value ->
         with :ok <- left.val.(value) do
@@ -56,4 +56,14 @@ defmodule Validation.Predicate do
 
     build_composed([left, right], composer, "and")
   end
+
+  @doc """
+  Built-in filled?
+  """
+  def built_in("filled?") do
+    build_basic(&filled?/1, "must be filled", "filled?")
+  end
+
+  defp filled?(value) when value in [nil, "", [], %{}], do: false
+  defp filled?(_value), do: true
 end

@@ -22,9 +22,9 @@ defmodule Validation.Rule do
   end
 
   @doc """
-  Build a rule that validates a single value by key and a predicate
+  Built-in rule that validates a single value by key and a predicate
   """
-  def build_value_rule(key, predicate) do
+  def built_in("value", key, predicate) do
     val = fn result ->
       result.data
       |> Map.get(key)
@@ -41,7 +41,7 @@ defmodule Validation.Rule do
   @doc """
   Build a rule that requires a certain key to be present
   """
-  def build_required_key(key) do
+  def built_in("required", key) do
     val = fn result ->
       result.data
       |> Map.has_key?(key)

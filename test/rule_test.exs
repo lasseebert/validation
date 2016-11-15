@@ -23,9 +23,9 @@ defmodule Validation.RuleTest do
     assert result.errors == %{name: ["must be filled"]}
   end
 
-  test "building a value rule" do
+  test "built-in value rule" do
     filled? = Predicate.build_basic(fn value -> !(value in ["", nil]) end, "must be filled", "filled?")
-    rule = Rule.build_value_rule(:name, filled?)
+    rule = Rule.built_in("value", :name, filled?)
 
     result = %Result{data: %{name: "Me"}} |> rule.val.()
     assert result.errors == %{}
@@ -34,8 +34,8 @@ defmodule Validation.RuleTest do
     assert result.errors == %{name: ["must be filled"]}
   end
 
-  test "building a required key rule" do
-    rule = Rule.build_required_key(:name)
+  test "built_in required rule" do
+    rule = Rule.built_in("required", :name)
 
     result = %Result{data: %{name: "Me"}} |> rule.val.()
     assert result.errors == %{}
