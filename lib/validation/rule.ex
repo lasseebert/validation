@@ -3,6 +3,7 @@ defmodule Validation.Rule do
   A rule accepts a %Result{} and returns an updated %Result{}
   """
 
+  alias Validation.Predicate
   alias Validation.Result
 
   defstruct [
@@ -34,10 +35,8 @@ defmodule Validation.Rule do
   """
   def built_in("value", key, predicate) do
     val = fn result ->
-      result.data
-      |> Map.get(key)
-      |> predicate.val.()
-      |> case do
+      value = Map.get(result.data, key)
+      case Predicate.apply(predicate, value) do
         :ok -> result
         {:error, message} -> Result.put_error(result, key, message)
       end

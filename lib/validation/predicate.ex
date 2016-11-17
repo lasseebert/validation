@@ -43,6 +43,14 @@ defmodule Validation.Predicate do
   end
 
   @doc """
+  Applies the predicate to the given value.
+  Returns :ok or {:error, message}
+  """
+  def apply(%__MODULE__{val: val}, value) do
+    val.(value)
+  end
+
+  @doc """
   Built-in and
   """
   def built_in("and", left, right) do
