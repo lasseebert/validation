@@ -5,16 +5,31 @@ defmodule Validation.SchemaTest do
   alias Validation.Rule
   alias Validation.Schema
 
-  test "using a simple schema" do
-    schema = Schema.build([Rule.built_in("value", :name, Predicate.built_in("filled?"))])
+  def simple_schema do
+    Schema.build([Rule.built_in("value", :name, Predicate.built_in("filled?"))])
+  end
 
-    assert schema.meta[:rules] |> length == 1
+  test "simple schema has metadata" do
+    schema = simple_schema
 
+    assert [%Rule{}] = schema.meta[:rules]
+  end
+
+  test "simple schema against invalid data" do
     params = %{name: ""}
-    result = schema.val.(params)
+    result = simple_schema.val.(params)
 
     assert result.valid? == false
     assert result.data == %{name: ""}
     assert result.errors == %{name: ["must be filled"]}
+  end
+
+  test "simple schema against valid data" do
+    params = %{name: "John"}
+    result = simple_schema.val.(params)
+
+    assert result.valid? == true
+    assert result.data == %{name: "John"}
+    assert result.errors == %{}
   end
 end
