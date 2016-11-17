@@ -12,6 +12,9 @@ defmodule Validation.Schema do
     meta: []
   ]
 
+  @doc """
+  Builds a schema from a list of rules
+  """
   def build(rules) do
     val = fn params ->
       result = %Result{data: params}
@@ -19,5 +22,13 @@ defmodule Validation.Schema do
     end
 
     %__MODULE__{val: val, meta: [rules: rules]}
+  end
+
+  @doc """
+  Applies the schema to a params map.
+  Returns a %Result{} struct
+  """
+  def apply(%__MODULE__{val: val}, params) do
+    val.(params)
   end
 end
