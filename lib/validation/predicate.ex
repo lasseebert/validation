@@ -1,6 +1,7 @@
 defmodule Validation.Predicate do
   @moduledoc """
-  A predicate holds a function that accepts a single value and returns either :ok or {:error, message}
+  A predicate holds a function that accepts a single value
+  and returns either :ok or {:error, message}
   """
 
   defstruct [
