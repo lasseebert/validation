@@ -5,6 +5,7 @@ defmodule Validation.Schema do
   """
 
   alias Validation.Result
+  alias Validation.Rule
 
   defstruct [
     val: nil,
@@ -14,10 +15,7 @@ defmodule Validation.Schema do
   def build(rules) do
     val = fn params ->
       result = %Result{data: params}
-      rules
-      |> Enum.reduce(result, fn rule, result ->
-        rule.val.(result)
-      end)
+      Enum.reduce(rules, result, &Rule.apply/2)
     end
 
     %__MODULE__{val: val, meta: [rules: rules]}

@@ -22,6 +22,14 @@ defmodule Validation.Rule do
   end
 
   @doc """
+  Applies the rule to the given result.
+  Returns an updated result
+  """
+  def apply(%__MODULE__{val: val}, result) do
+    val.(result)
+  end
+
+  @doc """
   Built-in rule that validates a single value by key and a predicate
   """
   def built_in("value", key, predicate) do
