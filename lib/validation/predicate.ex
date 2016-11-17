@@ -4,6 +4,11 @@ defmodule Validation.Predicate do
   and returns either :ok or {:error, message}
   """
 
+  @type  t            :: %__MODULE__{ val: compiled_fun, meta: meta_data }
+  @type  result       :: :ok | {:error, String.t}
+  @typep compiled_fun :: ((Any.t) -> result)
+  @typep meta_data    :: Keyword.t
+
   defstruct [
     val: nil,
     meta: []
@@ -12,6 +17,8 @@ defmodule Validation.Predicate do
   @doc """
   Builds a predicate data structure.
   """
+
+  @spec build(compiled_fun, meta_data) :: t
   def build(val, meta \\ []) do
     %__MODULE__{
       val: val,
@@ -23,6 +30,9 @@ defmodule Validation.Predicate do
   Build a basic predicate that validates a value and gives an error message
   The supplied fun should return true or false
   """
+
+  @type predicate_fun :: ((Any.t) -> boolean)
+  @spec build_basic(predicate_fun, String.t, String.t) :: t
   def build_basic(fun, message, name) do
     val = fn value ->
       if fun.(value) do
@@ -38,6 +48,9 @@ defmodule Validation.Predicate do
   @doc """
   Builds a predicate by composing multiple other predicates
   """
+
+  @type composer :: (([t]) -> compiled_fun)
+  @spec build_composed([t], composer, String.t) :: t
   def build_composed(predicates, composer, name) do
     val = composer.(predicates)
     build(val, type: "composed", name: name, predicates: predicates)
@@ -47,6 +60,7 @@ defmodule Validation.Predicate do
   Applies the predicate to the given value.
   Returns :ok or {:error, message}
   """
+  @spec apply(t, Ant.t) :: result
   def apply(%__MODULE__{val: val}, value) do
     val.(value)
   end
@@ -54,6 +68,7 @@ defmodule Validation.Predicate do
   @doc """
   Built-in and
   """
+  @spec built_in(String.t, t, t) :: t
   def built_in("and", left, right) do
     composer = fn [left, right] ->
       fn value ->
@@ -69,6 +84,7 @@ defmodule Validation.Predicate do
   @doc """
   Built-in filled?
   """
+  @spec built_in(String.t) :: t
   def built_in("filled?") do
     build_basic(&filled?/1, "must be filled", "filled?")
   end
