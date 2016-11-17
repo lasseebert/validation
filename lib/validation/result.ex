@@ -5,10 +5,14 @@ defmodule Validation.Result do
 
   defstruct [
     data: %{},
-    errors: %{}
+    errors: %{},
+    valid?: true
   ]
 
   def put_error(%__MODULE__{} = result, key, message) do
-    %{result | errors: Map.update(result.errors, key, [message], fn messages -> [message | messages] end)}
+    %{result |
+      errors: Map.update(result.errors, key, [message], fn messages -> [message | messages] end),
+      valid?: false
+    }
   end
 end
