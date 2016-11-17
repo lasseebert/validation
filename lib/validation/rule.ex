@@ -6,9 +6,9 @@ defmodule Validation.Rule do
   alias Validation.Predicate
   alias Validation.Result
 
-  @type t         :: %__MODULE__{val: rule_fun, meta: meta_data}
-  @type rule_fun  :: ((Result.t) -> Result.t)
-  @type meta_data :: Keyword.t
+  @type t          :: %__MODULE__{val: rule_fun, meta: meta_data}
+  @typep rule_fun  :: ((Result.t) -> Result.t)
+  @typep meta_data :: Keyword.t
 
   defstruct [
     val: nil,
