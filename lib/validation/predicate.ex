@@ -31,7 +31,7 @@ defmodule Validation.Predicate do
   The supplied fun should return true or false
   """
 
-  @type predicate_fun :: ((any) -> boolean)
+  @typep predicate_fun :: ((any) -> boolean)
   @spec build_basic(predicate_fun, String.t, String.t) :: t
   def build_basic(fun, message, name) do
     val = fn value ->
@@ -49,7 +49,7 @@ defmodule Validation.Predicate do
   Builds a predicate by composing multiple other predicates
   """
 
-  @type composer :: (([t]) -> compiled_fun)
+  @typep composer :: (([t]) -> compiled_fun)
   @spec build_composed([t], composer, String.t) :: t
   def build_composed(predicates, composer, name) do
     val = composer.(predicates)
