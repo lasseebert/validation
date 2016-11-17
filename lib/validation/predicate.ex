@@ -4,9 +4,9 @@ defmodule Validation.Predicate do
   and returns either :ok or {:error, message}
   """
 
-  @type  t            :: %__MODULE__{ val: compiled_fun, meta: meta_data }
+  @type  t            :: %__MODULE__{val: compiled_fun, meta: meta_data}
   @type  result       :: :ok | {:error, String.t}
-  @typep compiled_fun :: ((Any.t) -> result)
+  @typep compiled_fun :: ((any) -> result)
   @typep meta_data    :: Keyword.t
 
   defstruct [
@@ -31,7 +31,7 @@ defmodule Validation.Predicate do
   The supplied fun should return true or false
   """
 
-  @type predicate_fun :: ((Any.t) -> boolean)
+  @type predicate_fun :: ((any) -> boolean)
   @spec build_basic(predicate_fun, String.t, String.t) :: t
   def build_basic(fun, message, name) do
     val = fn value ->
@@ -60,7 +60,7 @@ defmodule Validation.Predicate do
   Applies the predicate to the given value.
   Returns :ok or {:error, message}
   """
-  @spec apply(t, Ant.t) :: result
+  @spec apply(t, any) :: result
   def apply(%__MODULE__{val: val}, value) do
     val.(value)
   end

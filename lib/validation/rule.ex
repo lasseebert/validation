@@ -6,7 +6,7 @@ defmodule Validation.Rule do
   alias Validation.Predicate
   alias Validation.Result
 
-  @type t         :: %__MODULE__{ val: rule_fun, meta: meta_data }
+  @type t         :: %__MODULE__{val: rule_fun, meta: meta_data}
   @type rule_fun  :: ((Result.t) -> Result.t)
   @type meta_data :: Keyword.t
 
@@ -39,7 +39,7 @@ defmodule Validation.Rule do
   @doc """
   Built-in rule that validates a single value by key and a predicate
   """
-  @spec built_in(String.t, Any.t, Predicate.t) :: t
+  @spec built_in(String.t, any, Predicate.t) :: t
   def built_in("value", key, predicate) do
     val = fn result ->
       value = Map.get(result.data, key)
@@ -55,7 +55,7 @@ defmodule Validation.Rule do
   @doc """
   Build a rule that requires a certain key to be present
   """
-  @spec built_in(String.t, Any.t) :: t
+  @spec built_in(String.t, any) :: t
   def built_in("required", key) do
     val = fn result ->
       result.data
