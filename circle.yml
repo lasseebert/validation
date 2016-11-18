@@ -22,3 +22,4 @@ test:
   override:
     - mix test
     - mix credo
+    - mix dialyzer --halt-exit-status
