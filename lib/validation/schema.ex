@@ -8,7 +8,7 @@ defmodule Validation.Schema do
   alias Validation.Rule
 
   @type t           :: %__MODULE__{val: schema_fun, meta: meta_data}
-  @typep schema_fun :: ((any) -> Result.t)
+  @typep schema_fun :: ((map) -> Result.t)
   @typep meta_data  :: Keyword.t
 
   defstruct [
@@ -33,7 +33,7 @@ defmodule Validation.Schema do
   Applies the schema to a params map.
   Returns a %Result{} struct
   """
-  @spec apply(t, any) :: Result.t
+  @spec apply(t, map) :: Result.t
   def apply(%__MODULE__{val: val}, params) do
     val.(params)
   end

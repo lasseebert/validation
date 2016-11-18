@@ -3,7 +3,7 @@ defmodule Validation.Result do
   The result of a validation. It contains the final data and errors.
   """
 
-  @type t :: %__MODULE__{data: Map.t, errors: Map.t, valid?: boolean}
+  @type t :: %__MODULE__{data: map, errors: map, valid?: boolean}
 
   defstruct [
     data: %{},
