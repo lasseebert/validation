@@ -7,6 +7,10 @@ defmodule Validation.Schema do
   alias Validation.Result
   alias Validation.Rule
 
+  @type t           :: %__MODULE__{val: schema_fun, meta: meta_data}
+  @typep schema_fun :: ((map) -> Result.t)
+  @typep meta_data  :: Keyword.t
+
   defstruct [
     val: nil,
     meta: []
@@ -15,6 +19,7 @@ defmodule Validation.Schema do
   @doc """
   Builds a schema from a list of rules
   """
+  @spec build([Rule.t]) :: t
   def build(rules) do
     val = fn params ->
       result = %Result{data: params}
@@ -28,6 +33,7 @@ defmodule Validation.Schema do
   Applies the schema to a params map.
   Returns a %Result{} struct
   """
+  @spec apply(t, map) :: Result.t
   def apply(%__MODULE__{val: val}, params) do
     val.(params)
   end

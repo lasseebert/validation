@@ -8,6 +8,7 @@ defmodule Validation.Mixfile do
       elixir: "~> 1.3",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
+      dialyzer: [plt_add_deps: :transitive],
       deps: deps()
     ]
   end
@@ -34,7 +35,8 @@ defmodule Validation.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:credo, "~> 0.5", only: [:dev, :test]}
+      {:credo, "~> 0.5", only: [:dev, :test]},
+      {:dialyxir, "~> 0.4", only: [:dev, :test]}
     ]
   end
 end
