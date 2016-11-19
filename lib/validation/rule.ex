@@ -3,11 +3,12 @@ defmodule Validation.Rule do
   A rule accepts a %Result{} and returns an updated %Result{}
   """
 
-  use Validation.Term
+  use   Validation.Term
   alias Validation.Result
 
   @typep application_result :: Result.t
 
+  @spec build(compiled_fun, meta_data) :: t
   def build(compiled, meta) do
     %__MODULE__{compiled: compiled, meta: meta}
   end
@@ -21,6 +22,7 @@ defmodule Validation.Rule do
     build_term(type: "value", key: key, predicate: predicate)
   end
 
+  @spec built_in(String.t, any, Schema.t) :: t
   def built_in("schema", key, schema) do
     build_term(type: "schema", key: key, schema: schema)
   end

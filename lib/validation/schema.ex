@@ -14,9 +14,7 @@ defmodule Validation.Schema do
   Builds a schema from a list of rules
   """
   @spec build([Rule.t]) :: t
-  def build(rules) do
-    build_term(rules: rules)
-  end
+  def build(rules), do: build_term(rules: rules)
 end
 
 defimpl Validation.Compilable, for: Validation.Schema do
