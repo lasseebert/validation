@@ -6,15 +6,6 @@ defmodule Validation.Rule do
   alias Validation.Result
   use Validation.Term
 
-  @doc """
-  Applies the rule to the given result.
-  Returns an updated result
-  """
-  @spec apply(t, Result.t) :: Result.t
-  def apply(%__MODULE__{val: val}, result) do
-    val.(result)
-  end
-
   def build(compiled, meta) do
     %__MODULE__{val: compiled, meta: meta}
   end

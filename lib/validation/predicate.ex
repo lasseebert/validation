@@ -7,15 +7,6 @@ defmodule Validation.Predicate do
   use Validation.Term
 
   @doc """
-  Applies the predicate to the given value.
-  Returns :ok or {:error, message}
-  """
-  #@spec apply(t, any) :: result
-  def apply(%__MODULE__{val: val}, value) do
-    val.(value)
-  end
-
-  @doc """
   Build a basic predicate that validates a value and gives an error message
   The supplied fun should return true or false
   """

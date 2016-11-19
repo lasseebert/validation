@@ -13,15 +13,6 @@ defmodule Validation.Schema do
   def build(rules) do
     compile(rules: rules)
   end
-
-  @doc """
-  Applies the schema to a params map.
-  Returns a %Result{} struct
-  """
-  @spec apply(t, map) :: Result.t
-  def apply(%__MODULE__{val: val}, params) do
-    val.(params)
-  end
 end
 
 defimpl Validation.Compilable, for: Validation.Schema do
