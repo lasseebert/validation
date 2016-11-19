@@ -4,26 +4,15 @@ defmodule Validation.Predicate do
   and returns either :ok or {:error, message}
   """
 
-  @type  t            :: %__MODULE__{val: compiled_fun, meta: meta_data}
-  @type  result       :: :ok | {:error, String.t}
-  @typep compiled_fun :: ((any) -> result)
-  @typep meta_data    :: Keyword.t
-
-  defstruct [
-    val: nil,
-    meta: []
-  ]
+  use Validation.Term
 
   @doc """
-  Builds a predicate data structure.
+  Applies the predicate to the given value.
+  Returns :ok or {:error, message}
   """
-
-  @spec build(compiled_fun, meta_data) :: t
-  def build(val, meta \\ []) do
-    %__MODULE__{
-      val: val,
-      meta: meta
-    }
+  #@spec apply(t, any) :: result
+  def apply(%__MODULE__{val: val}, value) do
+    val.(value)
   end
 
   @doc """
@@ -34,15 +23,7 @@ defmodule Validation.Predicate do
   @typep predicate_fun :: ((any) -> boolean)
   @spec build_basic(predicate_fun, String.t, String.t) :: t
   def build_basic(fun, message, name) do
-    val = fn value ->
-      if fun.(value) do
-        :ok
-      else
-        {:error, message}
-      end
-    end
-
-    build(val, type: "basic", name: name, message: message)
+    compile(type: "basic", name: name, message: message, fun: fun)
   end
 
   @doc """
@@ -52,17 +33,7 @@ defmodule Validation.Predicate do
   @typep composer :: (([t]) -> compiled_fun)
   @spec build_composed([t], composer, String.t) :: t
   def build_composed(predicates, composer, name) do
-    val = composer.(predicates)
-    build(val, type: "composed", name: name, predicates: predicates)
-  end
-
-  @doc """
-  Applies the predicate to the given value.
-  Returns :ok or {:error, message}
-  """
-  @spec apply(t, any) :: result
-  def apply(%__MODULE__{val: val}, value) do
-    val.(value)
+    compile(type: "composed", name: name, predicates: predicates, combinator: composer)
   end
 
   @doc """
@@ -91,4 +62,18 @@ defmodule Validation.Predicate do
 
   defp filled?(value) when value in [nil, "", [], %{}], do: false
   defp filled?(_value), do: true
+end
+
+defimpl Validation.Compilable, for: Validation.Predicate do
+  alias Validation.Predicate
+
+  def compile(%Predicate{meta: %{type: "basic", fun: fun, message: message}}) do
+    fn(value) ->
+      if fun.(value), do: :ok, else: {:error, message}
+    end
+  end
+
+  def compile(%Predicate{meta: %{type: "composed", predicates: preds, combinator: comb}}) do
+    comb.(preds)
+  end
 end
