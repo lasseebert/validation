@@ -15,7 +15,7 @@ defmodule Validation.Schema do
   """
   @spec build([Rule.t]) :: t
   def build(rules) do
-    compile(rules: rules)
+    build_term(rules: rules)
   end
 end
 

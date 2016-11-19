@@ -16,7 +16,7 @@ defmodule Validation.Predicate do
   @typep predicate_fun :: ((any) -> boolean)
   @spec build_basic(predicate_fun, String.t, String.t) :: t
   def build_basic(fun, message, name) do
-    compile(type: "basic", name: name, message: message, fun: fun)
+    build_term(type: "basic", name: name, message: message, fun: fun)
   end
 
   @doc """
@@ -26,7 +26,7 @@ defmodule Validation.Predicate do
   @typep composer :: (([t]) -> compiled_fun)
   @spec build_composed([t], composer, String.t) :: t
   def build_composed(predicates, composer, name) do
-    compile(type: "composed", name: name, predicates: predicates, combinator: composer)
+    build_term(type: "composed", name: name, predicates: predicates, combinator: composer)
   end
 
   @doc """

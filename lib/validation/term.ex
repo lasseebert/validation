@@ -1,7 +1,13 @@
 defmodule Validation.Term do
+  @moduledoc """
+  A term is a part of the validation algebra that can be compiled
+  """
+
   defmacro __using__(_opts) do
     quote do
-      @type t            :: %__MODULE__{compiled: compiled_fun, meta: meta_data}
+      import Validation.Compilable, only: [compile: 1]
+
+      @type t             :: %__MODULE__{compiled: compiled_fun, meta: meta_data}
       @typep compiled_fun :: ((any) -> application_result)
       @typep meta_data    :: Keyword.t
 
@@ -12,14 +18,12 @@ defmodule Validation.Term do
         compiled.(value)
       end
 
-      def compile(meta \\ []) do
+      def build_term(meta \\ []) do
         term = meta
                 |> Enum.into(%{})
                 |> new
 
-        compiled = Validation.Compilable.compile(term)
-
-        %{term | compiled: compiled}
+        %{term | compiled: compile(term)}
       end
 
       @spec new(meta_data) :: Validation.Compilable.t

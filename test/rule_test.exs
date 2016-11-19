@@ -18,7 +18,8 @@ defmodule Validation.RuleTest do
       end
     end
 
-    rule   = Rule.build(val, name: ["name must be filled"])
+
+    rule = Rule.build(val, name: ["name must be filled"])
 
     assert %{errors: %{}} = apply_rule(rule,  %{name: "Me"})
     assert %{errors: %{name: ["must be filled"]}} = apply_rule(rule, %{})
