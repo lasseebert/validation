@@ -34,11 +34,9 @@ defmodule Validation.Predicate do
   """
   @spec built_in(String.t, t, t) :: t
   def built_in("and", left, right) do
-    composer = fn [left, right] ->
-      fn value ->
-        with :ok <- left.compiled.(value) do
-          right.compiled.(value)
-        end
+    composer = fn([left, right]) ->
+      fn(value) ->
+        with :ok <- left.compiled.(value), do: right.compiled.(value)
       end
     end
 
@@ -69,4 +67,6 @@ defimpl Validation.Compilable, for: Validation.Predicate do
   def compile(%Predicate{meta: %{type: "composed", predicates: preds, combinator: comb}}) do
     comb.(preds)
   end
+
+  def compile(_), do: raise("Not compilable")
 end

@@ -31,4 +31,6 @@ defimpl Validation.Compilable, for: Validation.Schema do
       Enum.reduce(rules, result, &Rule.apply/2)
     end
   end
+
+  def compile(_), do: raise("Not compilable")
 end

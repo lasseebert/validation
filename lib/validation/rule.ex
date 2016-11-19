@@ -3,8 +3,8 @@ defmodule Validation.Rule do
   A rule accepts a %Result{} and returns an updated %Result{}
   """
 
-  alias Validation.Result
   use Validation.Term
+  alias Validation.Result
 
   @typep application_result :: Result.t
 
@@ -15,6 +15,7 @@ defmodule Validation.Rule do
   @doc """
   Built-in rule that validates a single value by key and a predicate
   """
+
   @spec built_in(String.t, any, Predicate.t) :: t
   def built_in("value", key, predicate) do
     build_term(type: "value", key: key, predicate: predicate)
@@ -72,4 +73,6 @@ defimpl Validation.Compilable, for: Validation.Rule do
       end
     end
   end
+
+  def compile(_), do: raise("Not compilable")
 end

@@ -13,11 +13,7 @@ defmodule Validation.Term do
 
       defstruct compiled: nil, meta: %{}
 
-      @spec apply(t, any) :: application_result
-      def apply(%__MODULE__{compiled: compiled}, value) do
-        compiled.(value)
-      end
-
+      @spec build_term(Keyword.t) :: t
       def build_term(meta \\ []) do
         term = meta
                 |> Enum.into(%{})
@@ -26,7 +22,12 @@ defmodule Validation.Term do
         %{term | compiled: compile(term)}
       end
 
-      @spec new(meta_data) :: Validation.Compilable.t
+      @spec apply(t, any) :: application_result
+      def apply(%__MODULE__{compiled: compiled}, value) do
+        compiled.(value)
+      end
+
+      @spec new(meta_data) :: t
       defp new(meta) do
         %__MODULE__{compiled: nil, meta: meta}
       end
