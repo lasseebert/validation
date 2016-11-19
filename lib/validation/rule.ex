@@ -53,6 +53,8 @@ defmodule Validation.Rule do
     build(val, [type: "value", key: key, predicate: predicate])
   end
 
+  # FIXME: it's odd that Rule depends on Schema and Schema depends on Rule.
+  # Both should probably depend on a common abstraction
   def built_in("schema", key, schema) do
     val = fn(result) ->
       value      = Map.get(result.data, key)
