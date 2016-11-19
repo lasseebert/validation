@@ -1,29 +1,30 @@
 defmodule Validation.Term do
   defmacro __using__(_opts) do
     quote do
-      @type t            :: %__MODULE__{val: compiled_fun, meta: meta_data}
-      @typep compiled_fun :: ((any) -> Result.t)
+      @type t            :: %__MODULE__{compiled: compiled_fun, meta: meta_data}
+      @typep compiled_fun :: ((any) -> application_result)
       @typep meta_data    :: Keyword.t
 
-      defstruct val: nil, meta: %{}
+      defstruct compiled: nil, meta: %{}
 
-      def apply(%__MODULE__{val: val}, value) do
-        val.(value)
+      @spec apply(t, any) :: application_result
+      def apply(%__MODULE__{compiled: compiled}, value) do
+        compiled.(value)
       end
 
       def compile(meta \\ []) do
         term = meta
-        |> Enum.into(%{})
-        |> new
+                |> Enum.into(%{})
+                |> new
 
         compiled = Validation.Compilable.compile(term)
 
-        %{term | val: compiled}
+        %{term | compiled: compiled}
       end
 
       @spec new(meta_data) :: Validation.Compilable.t
       defp new(meta) do
-        %__MODULE__{val: nil, meta: meta}
+        %__MODULE__{compiled: nil, meta: meta}
       end
     end
   end

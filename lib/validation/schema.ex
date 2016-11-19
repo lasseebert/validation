@@ -4,7 +4,11 @@ defmodule Validation.Schema do
   The result of evaluating a params map against a schema is a %Result{} struct.
   """
 
+  alias Validation.Result
   use Validation.Term
+
+  @type application_result :: Result.t
+
 
   @doc """
   Builds a schema from a list of rules

@@ -6,8 +6,10 @@ defmodule Validation.Rule do
   alias Validation.Result
   use Validation.Term
 
+  @typep application_result :: Result.t
+
   def build(compiled, meta) do
-    %__MODULE__{val: compiled, meta: meta}
+    %__MODULE__{compiled: compiled, meta: meta}
   end
 
   @doc """

@@ -6,6 +6,8 @@ defmodule Validation.Predicate do
 
   use Validation.Term
 
+  @typep application_result :: :ok | {:error, String.t}
+
   @doc """
   Build a basic predicate that validates a value and gives an error message
   The supplied fun should return true or false
@@ -34,8 +36,8 @@ defmodule Validation.Predicate do
   def built_in("and", left, right) do
     composer = fn [left, right] ->
       fn value ->
-        with :ok <- left.val.(value) do
-          right.val.(value)
+        with :ok <- left.compiled.(value) do
+          right.compiled.(value)
         end
       end
     end

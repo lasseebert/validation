@@ -16,10 +16,10 @@ defmodule Validation.RuleTest do
 
     rule = Rule.build(val, name: ["name must be filled"])
 
-    result = %Result{data: %{name: "Me"}} |> rule.val.()
+    result = %Result{data: %{name: "Me"}} |> rule.compiled.()
     assert result.errors == %{}
 
-    result = %Result{data: %{}} |> rule.val.()
+    result = %Result{data: %{}} |> rule.compiled.()
     assert result.errors == %{name: ["must be filled"]}
   end
 
@@ -27,20 +27,20 @@ defmodule Validation.RuleTest do
     filled? = Predicate.build_basic(fn value -> !(value in ["", nil]) end, "must be filled", "filled?")
     rule = Rule.built_in("value", :name, filled?)
 
-    result = %Result{data: %{name: "Me"}} |> rule.val.()
+    result = %Result{data: %{name: "Me"}} |> rule.compiled.()
     assert result.errors == %{}
 
-    result = %Result{data: %{}} |> rule.val.()
+    result = %Result{data: %{}} |> rule.compiled.()
     assert result.errors == %{name: ["must be filled"]}
   end
 
   test "built_in required rule" do
     rule = Rule.built_in("required", :name)
 
-    result = %Result{data: %{name: "Me"}} |> rule.val.()
+    result = %Result{data: %{name: "Me"}} |> rule.compiled.()
     assert result.errors == %{}
 
-    result = %Result{data: %{}} |> rule.val.()
+    result = %Result{data: %{}} |> rule.compiled.()
     assert result.errors == %{name: ["is missing"]}
   end
 end

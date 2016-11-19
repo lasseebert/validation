@@ -14,8 +14,8 @@ defmodule Validation.PredicateTest do
     assert predicate.meta[:name] == name
     assert predicate.meta[:type] == "basic"
 
-    assert predicate.val.("") == :ok
-    assert predicate.val.("foo") == {:error, "must be empty"}
+    assert Predicate.apply(predicate, "") == :ok
+    assert Predicate.apply(predicate, "foo") == {:error, "must be empty"}
   end
 
   test "building a composed and-predicate manually" do
@@ -24,8 +24,8 @@ defmodule Validation.PredicateTest do
 
     composer = fn [left, right] ->
       fn value ->
-        with :ok <- left.val.(value) do
-          right.val.(value)
+        with :ok <- left.compiled.(value) do
+          right.compiled.(value)
         end
       end
     end
@@ -35,9 +35,9 @@ defmodule Validation.PredicateTest do
     assert composed.meta[:type] == "composed"
     assert composed.meta[:predicates] == [filled?, string?]
 
-    assert composed.val.("") == {:error, "must be filled"}
-    assert composed.val.(42) == {:error, "must be a string"}
-    assert composed.val.("foo") == :ok
+    assert Predicate.apply(composed, "") == {:error, "must be filled"}
+    assert Predicate.apply(composed, 42) == {:error, "must be a string"}
+    assert Predicate.apply(composed, "foo") == :ok
   end
 
   describe "built_in" do
@@ -47,9 +47,9 @@ defmodule Validation.PredicateTest do
 
       composed = Predicate.built_in("and", filled?, string?)
 
-      assert composed.val.("") == {:error, "must be filled"}
-      assert composed.val.(42) == {:error, "must be a string"}
-      assert composed.val.("foo") == :ok
+      assert Predicate.apply(composed, "") == {:error, "must be filled"}
+      assert Predicate.apply(composed, 42) == {:error, "must be a string"}
+      assert Predicate.apply(composed, "foo") == :ok
     end
 
     test "filled?" do
@@ -58,12 +58,12 @@ defmodule Validation.PredicateTest do
       assert filled?.meta[:name] == "filled?"
       assert filled?.meta[:type] == "basic"
 
-      assert filled?.val.("something") == :ok
-      assert filled?.val.(42) == :ok
-      assert filled?.val.(nil) == {:error, "must be filled"}
-      assert filled?.val.("") == {:error, "must be filled"}
-      assert filled?.val.([]) == {:error, "must be filled"}
-      assert filled?.val.(%{}) == {:error, "must be filled"}
+      assert Predicate.apply(filled?, "something") == :ok
+      assert Predicate.apply(filled?, 42) == :ok
+      assert Predicate.apply(filled?, nil) == {:error, "must be filled"}
+      assert Predicate.apply(filled?, "") == {:error, "must be filled"}
+      assert Predicate.apply(filled?, []) == {:error, "must be filled"}
+      assert Predicate.apply(filled?, %{}) == {:error, "must be filled"}
     end
   end
 end
