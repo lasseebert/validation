@@ -26,7 +26,7 @@ defmodule Validation.RuleTest do
 
   test "built-in value rule" do
     filled? = Predicate.build_basic(fn value -> !(value in ["", nil]) end, "must be filled", "filled?")
-    rule = Rule.built_in("value", :name, filled?)
+    rule    = Rule.built_in("value", :name, filled?)
 
     assert %{errors: %{}} = apply_rule(rule, %{name: "Me"})
     assert %{errors: %{name: ["must be filled"]}} = apply_rule(rule, %{})
@@ -36,6 +36,6 @@ defmodule Validation.RuleTest do
     rule = Rule.built_in("required", :name)
 
     assert %{errors: %{}} = apply_rule(rule, %{name: "Me"})
-    assert %{ errors: %{name: ["is missing"]}} = apply_rule(rule, %{})
+    assert %{errors: %{name: ["is missing"]}} = apply_rule(rule, %{})
   end
 end
