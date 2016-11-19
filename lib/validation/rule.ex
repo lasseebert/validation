@@ -17,12 +17,11 @@ defmodule Validation.Rule do
   Built-in rule that validates a single value by key and a predicate
   """
 
-  @spec built_in(String.t, any, Predicate.t) :: t
+  @spec built_in(String.t, any, Predicate.t | Schema.t) :: t
   def built_in("value", key, predicate) do
     build_term(type: "value", key: key, predicate: predicate)
   end
 
-  @spec built_in(String.t, any, Schema.t) :: t
   def built_in("schema", key, schema) do
     build_term(type: "schema", key: key, schema: schema)
   end
