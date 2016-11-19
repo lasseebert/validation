@@ -5,6 +5,7 @@ defmodule Validation.Rule do
 
   alias Validation.Predicate
   alias Validation.Result
+  alias Validation.Schema
 
   @type t          :: %__MODULE__{val: rule_fun, meta: meta_data}
   @typep rule_fun  :: ((Result.t) -> Result.t)
@@ -44,12 +45,27 @@ defmodule Validation.Rule do
     val = fn result ->
       value = Map.get(result.data, key)
       case Predicate.apply(predicate, value) do
-        :ok -> result
+        :ok               -> result
         {:error, message} -> Result.put_error(result, key, message)
       end
     end
 
     build(val, [type: "value", key: key, predicate: predicate])
+  end
+
+  def built_in("schema", key, schema) do
+    val = fn(result) ->
+      value      = Map.get(result.data, key)
+      new_result = Schema.apply(schema, value)
+
+      if new_result.valid? do
+        result
+      else
+        Result.put_error(result, key, new_result.errors)
+      end
+    end
+
+    build(val, type: "schema", key: key, schema: schema)
   end
 
   @doc """

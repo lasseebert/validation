@@ -23,6 +23,7 @@ defmodule Validation.Schema do
   def build(rules) do
     val = fn params ->
       result = %Result{data: params}
+
       Enum.reduce(rules, result, &Rule.apply/2)
     end
 

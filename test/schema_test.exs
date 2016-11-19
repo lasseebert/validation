@@ -9,27 +9,71 @@ defmodule Validation.SchemaTest do
     Schema.build([Rule.built_in("value", :name, Predicate.built_in("filled?"))])
   end
 
-  test "simple schema has metadata" do
-    schema = simple_schema
-
-    assert [%Rule{}] = schema.meta[:rules]
+  def nested_schema do
+    Schema.build([
+      Rule.built_in("required", :id),
+      Rule.built_in("schema", :user, simple_schema)
+    ])
   end
 
-  test "simple schema against invalid data" do
-    params = %{name: ""}
-    result = Schema.apply(simple_schema, params)
+  describe "nested schema" do
+    test "has metadata" do
+      schema = nested_schema
 
-    assert result.valid? == false
-    assert result.data == %{name: ""}
-    assert result.errors == %{name: ["must be filled"]}
+      assert [%Rule{}, %Rule{}] = schema.meta[:rules]
+    end
+
+    test "against invalid data" do
+      params = %{user: %{ name: "" }}
+      result = Schema.apply(nested_schema, params)
+
+      refute result.valid?
+      assert result.data   == %{user: %{name: ""}}
+      assert result.errors == %{id: ["is missing"], user: [%{name: ["must be filled"]}]}
+    end
+
+    test "against invalid nested data" do
+      params = %{id: 1, user: %{ name: "" }}
+      result = Schema.apply(nested_schema, params)
+
+      refute result.valid?
+      assert result.data   == params
+      assert result.errors == %{user: [%{name: ["must be filled"]}]}
+    end
+
+    test "against valid data" do
+      params = %{id: 1, user: %{ name: "Alice" }}
+      result = Schema.apply(nested_schema, params)
+
+      assert result.valid?
+      assert result.data == params
+      assert result.errors == %{}
+    end
   end
 
-  test "simple schema against valid data" do
-    params = %{name: "John"}
-    result = Schema.apply(simple_schema, params)
+  describe "simple schema" do
+    test "has metadata" do
+      schema = simple_schema
 
-    assert result.valid? == true
-    assert result.data == %{name: "John"}
-    assert result.errors == %{}
+      assert [%Rule{}] = schema.meta[:rules]
+    end
+
+    test "against invalid data" do
+      params = %{name: ""}
+      result = Schema.apply(simple_schema, params)
+
+      refute result.valid?
+      assert result.data == params
+      assert result.errors == %{name: ["must be filled"]}
+    end
+
+    test "simple schema against valid data" do
+      params = %{name: "John"}
+      result = Schema.apply(simple_schema, params)
+
+      assert result.valid?
+      assert result.data == params
+      assert result.errors == %{}
+    end
   end
 end
