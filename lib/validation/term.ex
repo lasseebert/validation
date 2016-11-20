@@ -15,7 +15,7 @@ defmodule Validation.Term do
     When it is evaluated it either returns `:ok` or an error `{:error, String.t}`.
 
     You can create your own primitive terms by implementing `using` this module
-    and optionally implementing `Validation.Compilable` for your configuration.
+    and implementing `Validation.Compilable` for your configuration.
     """
 
     @type evaluation_result :: :ok | {:error, String.t}
@@ -38,6 +38,7 @@ defmodule Validation.Term do
     """
 
     alias Validation.Result
+
     @type evaluation_result :: Result.t
 
     defmacro __using__(_opts) do
@@ -95,6 +96,6 @@ defmodule Validation.Term do
   end
 
   def evaluate(_, _) do
-    raise("Term is not compiled and can thus not be evaluated")
+    raise("Term can not be evaluated")
   end
 end
