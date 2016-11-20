@@ -34,16 +34,15 @@ defmodule Validation.Rule do
 end
 
 defimpl Validation.Compilable, for: Validation.Rule do
-  alias Validation.Predicate
-  alias Validation.Schema
   alias Validation.Result
   alias Validation.Rule
+  alias Validation.Term
 
   def compile(%Rule{meta: %{type: "value", key: key, predicate: pred}}) do
     compiled = fn(result) ->
       value = Map.get(result.data, key)
 
-      case Predicate.apply(pred, value) do
+      case Term.evaluate(pred, value) do
         :ok               -> result
         {:error, message} -> Result.put_error(result, key, message)
       end
@@ -67,7 +66,7 @@ defimpl Validation.Compilable, for: Validation.Rule do
   def compile(%Rule{meta: %{type: "schema", key: key, schema: schema}}) do
     compiled = fn(result) ->
       value      = Map.get(result.data, key)
-      new_result = Schema.apply(schema, value)
+      new_result = Term.evaluate(schema, value)
 
       if new_result.valid? do
         result

@@ -16,14 +16,14 @@ end
 
 defimpl Validation.Compilable, for: Validation.Schema do
   alias Validation.Schema
-  alias Validation.Rule
   alias Validation.Result
+  alias Validation.Term
 
   def compile(%Schema{meta: %{rules: rules}}) do
     compiled = fn(params) ->
       result = %Result{data: params}
 
-      Enum.reduce(rules, result, &Rule.apply/2)
+      Enum.reduce(rules, result, &Term.evaluate/2)
     end
 
     {:ok, compiled}

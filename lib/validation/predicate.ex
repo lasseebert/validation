@@ -32,13 +32,14 @@ defmodule Validation.Predicate do
   """
   @spec built_in(String.t, t, t) :: t
   def built_in("and", left, right) do
-    composer = fn([left, right]) ->
-      fn(value) ->
-        with :ok <- left.compiled.(value), do: right.compiled.(value)
-      end
-    end
+    build_composed([left, right], junctor("and"), "and")
+  end
 
-    build_composed([left, right], composer, "and")
+  @doc """
+  Built-in or
+  """
+  def built_in("or", left, right) do
+    build_composed([left, right], junctor("or"), "and")
   end
 
   @doc """
@@ -51,6 +52,25 @@ defmodule Validation.Predicate do
 
   defp filled?(value) when value in [nil, "", [], %{}], do: false
   defp filled?(_value), do: true
+
+  defp junctor(kind) do
+    fn([left, right]) -> do_junctor(kind, left, right) end
+  end
+
+  defp do_junctor("and", left, right) do
+    fn(value) ->
+      with :ok <- left.compiled.(value), do: right.compiled.(value)
+    end
+  end
+
+  defp do_junctor("or", left, right) do
+    fn(value) ->
+      case left.compiled.(value) do
+        :ok -> succeed
+        _   -> right.compiled.(value)
+      end
+    end
+  end
 end
 
 defimpl Validation.Compilable, for: Validation.Predicate do
@@ -58,7 +78,7 @@ defimpl Validation.Compilable, for: Validation.Predicate do
 
   def compile(%Predicate{meta: %{type: "basic", fun: fun, message: message}}) do
     compiled = fn(value) ->
-      if fun.(value), do: :ok, else: {:error, message}
+      if fun.(value), do: Predicate.succeed, else: Predicate.fail(message)
     end
 
     {:ok, compiled}

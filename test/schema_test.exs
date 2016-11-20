@@ -4,6 +4,7 @@ defmodule Validation.SchemaTest do
   alias Validation.Predicate
   alias Validation.Rule
   alias Validation.Schema
+  alias Validation.Term
 
   def simple_schema do
     Schema.build([Rule.built_in("value", :name, Predicate.built_in("filled?"))])
@@ -25,7 +26,7 @@ defmodule Validation.SchemaTest do
 
     test "against invalid data" do
       params = %{user: %{ name: "" }}
-      result = Schema.apply(nested_schema, params)
+      result = Term.evaluate(nested_schema, params)
 
       refute result.valid?
       assert result.data   == %{user: %{name: ""}}
@@ -34,7 +35,7 @@ defmodule Validation.SchemaTest do
 
     test "against invalid nested data" do
       params = %{id: 1, user: %{ name: "" }}
-      result = Schema.apply(nested_schema, params)
+      result = Term.evaluate(nested_schema, params)
 
       refute result.valid?
       assert result.data   == params
@@ -43,7 +44,7 @@ defmodule Validation.SchemaTest do
 
     test "against valid data" do
       params = %{id: 1, user: %{ name: "Alice" }}
-      result = Schema.apply(nested_schema, params)
+      result = Term.evaluate(nested_schema, params)
 
       assert result.valid?
       assert result.data == params
@@ -60,7 +61,7 @@ defmodule Validation.SchemaTest do
 
     test "against invalid data" do
       params = %{name: ""}
-      result = Schema.apply(simple_schema, params)
+      result = Term.evaluate(simple_schema, params)
 
       refute result.valid?
       assert result.data == params
@@ -69,7 +70,7 @@ defmodule Validation.SchemaTest do
 
     test "simple schema against valid data" do
       params = %{name: "John"}
-      result = Schema.apply(simple_schema, params)
+      result = Term.evaluate(simple_schema, params)
 
       assert result.valid?
       assert result.data == params

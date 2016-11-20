@@ -4,9 +4,10 @@ defmodule Validation.RuleTest do
   alias Validation.Predicate
   alias Validation.Result
   alias Validation.Rule
+  alias Validation.Term
 
   def apply_rule(rule, data) do
-    Rule.apply(rule, %Result{data: data})
+    Term.evaluate(rule, %Result{data: data})
   end
 
   test "building a simple custom rule" do

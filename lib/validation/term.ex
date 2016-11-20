@@ -9,26 +9,59 @@ defmodule Validation.Term do
   are compound terms.
   """
 
+  defmodule Primitive do
+    @moduledoc """
+    A primitive encapsulates invariants on the data that is to be validated.
+    When it is evaluated it either returns `:ok` or an error `{:error, String.t}`.
+
+    You can create your own primitive terms by implementing `using` this module
+    and optionally implementing `Validation.Compilable` for your configuration.
+    """
+
+    @type evaluation_result :: :ok | {:error, String.t}
+
+    defmacro __using__(_opts) do
+      quote do
+        use Validation.Term
+
+        def succeed,       do: :ok
+        def fail(message), do: {:error, message}
+      end
+    end
+  end
+
+  defmodule Compound do
+    @moduledoc """
+    A compound term is a term that orchestrates other
+    compound or primitive terms. If it is evaluated it
+    returns a `Validation.Result`.
+    """
+
+    alias Validation.Result
+    @type evaluation_result :: Result.t
+
+    defmacro __using__(_opts) do
+      quote do
+        use Validation.Term
+      end
+    end
+  end
+
   defmacro __using__(_opts) do
     quote do
       import Validation.Term
-      alias Validation.Compilable
+      alias  Validation.Compilable
+      alias  Validation.Term.{Primitive, Compound}
 
       defstruct compiled: nil, meta: %{}
 
       @type t           :: %__MODULE__{compiled: compilation, meta: %{}}
       @type meta_data   :: Keyword.t
-      @type compilation :: ((any) -> evaluation_result)
+      @type compilation :: ((any) -> Compound.evaluation_result | Primitive.evaluation_result)
 
       @callback new(map)          :: t
       @callback compile_term(map) :: {:ok, t} | {:error, String.t}
-      @callback evaluate(t, any)  :: any
-      @optional_callbacks new: 1, evaluate: 2, compile_term: 1
-
-      @spec apply(t, any) :: evaluation_result
-      def apply(%__MODULE__{compiled: compilation}, value) do
-        compilation.(value)
-      end
+      @optional_callbacks new: 1, compile_term: 1
 
       @spec new(map) :: t
       def new(configuration) do
@@ -55,39 +88,14 @@ defmodule Validation.Term do
       end
     end
   end
-end
 
-defmodule Validation.Term.Primitive do
-  @moduledoc """
-  A primitive encapsulates invariants on the data that is to be validated.
-  When it is evaluated it either returns `:ok` or an error `{:error, String.t}`.
-
-  You can create your own primitive terms by implementing `using` this module
-  and optionally implementing `Validation.Compilable` for your configuration.
-  """
-
-  defmacro __using__(_opts) do
-    quote do
-      use Validation.Term
-
-      @type evaluation_result :: :ok | {:error, String.t}
-    end
+  @type evaluation_result  :: Primitive.evaluation_result | Compound.evaluation_result
+  @spec evaluate(any, any) :: evaluation_result | no_return
+  def evaluate(%{compiled: compiled}, value) when is_function(compiled) do
+    compiled.(value)
   end
-end
 
-defmodule Validation.Term.Compound do
-  @moduledoc """
-  A compound term is a term that orchestrates other
-  compound or primitive terms. If it is evaluated it
-  returns a `Validation.Result`.
-  """
-
-  defmacro __using__(_opts) do
-    quote do
-      use Validation.Term
-      alias Validation.Result
-
-      @type evaluation_result :: Result.t
-    end
+  def evaluate(_, _) do
+    raise("Term is not compiled and can thus not be evaluated")
   end
 end
