@@ -5,10 +5,7 @@ defmodule Validation.Schema do
   """
 
   alias Validation.Result
-  use Validation.Term
-
-  @type application_result :: Result.t
-
+  use Validation.Term.Compound
 
   @doc """
   Builds a schema from a list of rules
@@ -23,12 +20,14 @@ defimpl Validation.Compilable, for: Validation.Schema do
   alias Validation.Result
 
   def compile(%Schema{meta: %{rules: rules}}) do
-    fn(params) ->
+    compiled = fn(params) ->
       result = %Result{data: params}
 
       Enum.reduce(rules, result, &Rule.apply/2)
     end
+
+    {:ok, compiled}
   end
 
-  def compile(_), do: raise("Not compilable")
+  def compile(_), do: {:error, "Invalid schema configuration"}
 end

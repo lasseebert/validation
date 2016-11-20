@@ -4,9 +4,7 @@ defmodule Validation.Predicate do
   and returns either :ok or {:error, message}
   """
 
-  use Validation.Term
-
-  @typep application_result :: :ok | {:error, String.t}
+  use Validation.Term.Primitive
 
   @doc """
   Build a basic predicate that validates a value and gives an error message
@@ -23,7 +21,7 @@ defmodule Validation.Predicate do
   Builds a predicate by composing multiple other predicates
   """
 
-  @typep composer :: (([t]) -> compiled_fun)
+  @typep composer :: (([t]) -> compilation)
   @spec  build_composed([t], composer, String.t) :: t
   def build_composed(predicates, composer, name) do
     build_term(type: "composed", name: name, predicates: predicates, combinator: composer)
@@ -59,14 +57,16 @@ defimpl Validation.Compilable, for: Validation.Predicate do
   alias Validation.Predicate
 
   def compile(%Predicate{meta: %{type: "basic", fun: fun, message: message}}) do
-    fn(value) ->
+    compiled = fn(value) ->
       if fun.(value), do: :ok, else: {:error, message}
     end
+
+    {:ok, compiled}
   end
 
   def compile(%Predicate{meta: %{type: "composed", predicates: preds, combinator: comb}}) do
-    comb.(preds)
+    {:ok, comb.(preds)}
   end
 
-  def compile(_), do: raise("Not compilable")
+  def compile(_), do: {:error, "Invalid predicate configuration"}
 end

@@ -3,12 +3,10 @@ defmodule Validation.Rule do
   A rule accepts a %Result{} and returns an updated %Result{}
   """
 
-  use   Validation.Term
+  use   Validation.Term.Compound
   alias Validation.Result
 
-  @typep application_result :: Result.t
-
-  @spec build(compiled_fun, meta_data) :: t
+  @spec build(compilation, meta_data) :: t
   def build(compiled, meta) do
     %__MODULE__{compiled: compiled, meta: meta}
   end
@@ -42,7 +40,7 @@ defimpl Validation.Compilable, for: Validation.Rule do
   alias Validation.Rule
 
   def compile(%Rule{meta: %{type: "value", key: key, predicate: pred}}) do
-    fn(result) ->
+    compiled = fn(result) ->
       value = Map.get(result.data, key)
 
       case Predicate.apply(pred, value) do
@@ -50,20 +48,24 @@ defimpl Validation.Compilable, for: Validation.Rule do
         {:error, message} -> Result.put_error(result, key, message)
       end
     end
+
+    {:ok, compiled}
   end
 
   def compile(%Rule{meta: %{type: "required_key", key: key}}) do
-    fn(result) ->
+    compiled = fn(result) ->
       if Map.has_key?(result.data, key) do
         result
       else
         Result.put_error(result, key, "is missing")
       end
     end
+
+    {:ok, compiled}
   end
 
   def compile(%Rule{meta: %{type: "schema", key: key, schema: schema}}) do
-    fn(result) ->
+    compiled = fn(result) ->
       value      = Map.get(result.data, key)
       new_result = Schema.apply(schema, value)
 
@@ -73,7 +75,9 @@ defimpl Validation.Compilable, for: Validation.Rule do
         Result.put_error(result, key, new_result.errors)
       end
     end
+
+    {:ok, compiled}
   end
 
-  def compile(_), do: raise("Not compilable")
+  def compile(_), do: {:error, "Invalid rule configuration"}
 end
