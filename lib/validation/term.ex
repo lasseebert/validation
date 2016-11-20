@@ -14,16 +14,15 @@ defmodule Validation.Term do
       import Validation.Term
       alias Validation.Compilable
 
+      defstruct compiled: nil, meta: %{}
+
       @type t           :: %__MODULE__{compiled: compilation, meta: %{}}
       @type meta_data   :: Keyword.t
       @type compilation :: ((any) -> evaluation_result)
 
-      defstruct compiled: nil, meta: %{}
-
       @callback new(map)          :: t
       @callback compile_term(map) :: {:ok, t} | {:error, String.t}
       @callback evaluate(t, any)  :: any
-
       @optional_callbacks new: 1, evaluate: 2, compile_term: 1
 
       @spec apply(t, any) :: evaluation_result
