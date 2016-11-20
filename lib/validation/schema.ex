@@ -4,7 +4,7 @@ defmodule Validation.Schema do
   The result of evaluating a params map against a schema is a %Result{} struct.
   """
 
-  alias Validation.Result
+  alias Validation.{Result, Rule}
   use Validation.Term.Compound
 
   @doc """

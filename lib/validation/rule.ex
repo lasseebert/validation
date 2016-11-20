@@ -4,7 +4,7 @@ defmodule Validation.Rule do
   """
 
   use   Validation.Term.Compound
-  alias Validation.Result
+  alias Validation.{Result, Schema, Predicate}
 
   @spec build(compilation, meta_data) :: t
   def build(compiled, meta) do
