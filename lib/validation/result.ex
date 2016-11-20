@@ -18,4 +18,13 @@ defmodule Validation.Result do
       valid?: false
     }
   end
+
+  @spec merge(t, t) :: t
+  def merge(lhs, rhs) do
+    if lhs.valid? && rhs.valid? do
+      %__MODULE__{valid?: true, errors: %{}, data: Map.merge(lhs.data, rhs.data)}
+    else
+      %__MODULE__{valid?: false, errors: Map.merge(lhs.errors, rhs.errors), data: Map.merge(lhs.data, rhs.data)}
+    end
+  end
 end
