@@ -28,6 +28,4 @@ defimpl Validation.Compilable, for: Validation.Schema do
 
     {:ok, compiled}
   end
-
-  def compile(_), do: {:error, "Invalid schema configuration"}
 end

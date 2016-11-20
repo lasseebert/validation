@@ -78,6 +78,4 @@ defimpl Validation.Compilable, for: Validation.Rule do
 
     {:ok, compiled}
   end
-
-  def compile(_), do: {:error, "Invalid rule configuration"}
 end

@@ -67,6 +67,4 @@ defimpl Validation.Compilable, for: Validation.Predicate do
   def compile(%Predicate{meta: %{type: "composed", predicates: preds, combinator: comb}}) do
     {:ok, comb.(preds)}
   end
-
-  def compile(_), do: {:error, "Invalid predicate configuration"}
 end
