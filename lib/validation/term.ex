@@ -49,7 +49,6 @@ defmodule Validation.Term do
 
   defmacro __using__(_opts) do
     quote do
-      import Validation.Term
       alias  Validation.Compilable
       alias  Validation.Term.{Primitive, Compound}
 
