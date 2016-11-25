@@ -23,7 +23,10 @@ defmodule Validation.Schema do
   def build(rules) do
     val = fn params ->
       result = %Result{data: params}
-      Enum.reduce(rules, result, &Rule.apply/2)
+      Enum.reduce(rules, result, fn rule, result ->
+        errors = Rule.apply(rule, result.data)
+        Result.merge_errors(result, errors)
+      end)
     end
 
     %__MODULE__{val: val, meta: [rules: rules]}
