@@ -5,6 +5,8 @@ defmodule Validation.Preprocessor do
   In a schema, an ordered list of preprocessors is applied before the rules.
   """
 
+  import Kernel, except: [apply: 2]
+
   @type t :: %__MODULE__{val: preprocessor_fun, meta: meta_data}
   @typep params :: map
   @typep preprocessor_fun :: ((params) -> params)
@@ -33,5 +35,20 @@ defmodule Validation.Preprocessor do
   @spec apply(t, params) :: params
   def apply(%__MODULE__{val: val}, params) do
     val.(params)
+  end
+
+  @doc """
+  Combines multiple preprocessors into a single preprocessor.
+  The resulting preprocessor applies each given preprocessor in serial.
+  """
+  @spec combine([t]) :: t
+  def combine(preprocessors) do
+    val = fn params ->
+      preprocessors
+      |> Enum.reduce(params, fn preprocessor, params ->
+        apply(preprocessor, params)
+      end)
+    end
+    build(val, type: "combined", preprocessors: preprocessors)
   end
 end
