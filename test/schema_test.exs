@@ -2,6 +2,7 @@ defmodule Validation.SchemaTest do
   use ExUnit.Case, async: true
 
   alias Validation.Predicate
+  alias Validation.Preprocessor
   alias Validation.Rule
   alias Validation.Schema
 
@@ -30,6 +31,26 @@ defmodule Validation.SchemaTest do
 
     assert result.valid? == true
     assert result.data == %{name: "John"}
+    assert result.errors == %{}
+  end
+
+  test "schema with preprocessor" do
+    upcaser = Preprocessor.build(fn params ->
+      params |>
+      Enum.map(fn {key, value} -> {key, value |> String.upcase} end)
+      |> Enum.into(%{})
+    end)
+
+    schema = Schema.build(
+      [Rule.built_in("value", :name, Predicate.built_in("filled?"))],
+      upcaser
+    )
+
+    params = %{name: "John"}
+    result = Schema.apply(schema, params)
+
+    assert result.valid? == true
+    assert result.data == %{name: "JOHN"}
     assert result.errors == %{}
   end
 end

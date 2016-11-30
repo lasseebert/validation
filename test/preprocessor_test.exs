@@ -43,4 +43,11 @@ defmodule Validation.PreprocessorTest do
 
     assert processed == %{name: "JOHN"}
   end
+
+  test "identity preprocessor" do
+    identity = Preprocessor.identity
+    params = %{name: "John"}
+
+    assert Preprocessor.apply(identity, params) == params
+  end
 end

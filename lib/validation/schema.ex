@@ -4,6 +4,7 @@ defmodule Validation.Schema do
   The result of evaluating a params map against a schema is a %Result{} struct.
   """
 
+  alias Validation.Preprocessor
   alias Validation.Result
   alias Validation.Rule
 
@@ -17,11 +18,12 @@ defmodule Validation.Schema do
   ]
 
   @doc """
-  Builds a schema from a list of rules
+  Builds a schema from a list of rules and optionally a preprocessor
   """
-  @spec build([Rule.t]) :: t
-  def build(rules) do
+  @spec build([Rule.t], Preprocessor.t) :: t
+  def build(rules, preprocessor \\ Preprocessor.identity) do
     val = fn params ->
+      params = Preprocessor.apply(preprocessor, params)
       result = %Result{data: params}
       Enum.reduce(rules, result, fn rule, result ->
         errors = Rule.apply(rule, result.data)

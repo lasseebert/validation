@@ -51,4 +51,13 @@ defmodule Validation.Preprocessor do
     end
     build(val, type: "combined", preprocessors: preprocessors)
   end
+
+  @doc """
+  The preprocessor that returns the input params untouched.
+  This can be used as a default preprocessor.
+  """
+  @spec identity() :: t
+  def identity do
+    build(&(&1), type: "identity")
+  end
 end
