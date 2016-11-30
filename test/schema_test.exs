@@ -52,5 +52,7 @@ defmodule Validation.SchemaTest do
     assert result.valid? == true
     assert result.data == %{name: "JOHN"}
     assert result.errors == %{}
+
+    assert schema.meta[:preprocessor] == upcaser
   end
 end

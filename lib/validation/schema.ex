@@ -31,7 +31,7 @@ defmodule Validation.Schema do
       end)
     end
 
-    %__MODULE__{val: val, meta: [rules: rules]}
+    %__MODULE__{val: val, meta: [rules: rules, preprocessor: preprocessor]}
   end
 
   @doc """
