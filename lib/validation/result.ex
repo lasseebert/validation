@@ -18,4 +18,20 @@ defmodule Validation.Result do
       valid?: false
     }
   end
+
+  @spec merge_errors(t, map) :: t
+  @doc """
+  Merges the given errors with the errors in the result.
+  Returns an updated result
+  """
+  def merge_errors(%__MODULE__{} = result, errors) do
+    updated_errors = Map.merge(result.errors, errors, fn _key, v1, v2 ->
+      Enum.uniq(v1 ++ v2)
+    end)
+
+    %{result |
+      errors: updated_errors,
+      valid?: !Enum.any?(updated_errors)
+    }
+  end
 end

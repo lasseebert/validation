@@ -1,13 +1,12 @@
 defmodule Validation.Rule do
   @moduledoc """
-  A rule accepts a %Result{} and returns an updated %Result{}
+  A rule accepts a params map and returns an error map
   """
 
   alias Validation.Predicate
-  alias Validation.Result
 
   @type t          :: %__MODULE__{val: rule_fun, meta: meta_data}
-  @typep rule_fun  :: ((Result.t) -> Result.t)
+  @typep rule_fun  :: ((map) -> map)
   @typep meta_data :: Keyword.t
 
   defstruct [
@@ -28,10 +27,10 @@ defmodule Validation.Rule do
   end
 
   @doc """
-  Applies the rule to the given result.
-  Returns an updated result
+  Applies the rule to the given input map.
+  Returns an error map
   """
-  @spec apply(t, Result.t) :: Result.t
+  @spec apply(t, map) :: map
   def apply(%__MODULE__{val: val}, result) do
     val.(result)
   end
@@ -41,11 +40,11 @@ defmodule Validation.Rule do
   """
   @spec built_in(String.t, any, Predicate.t) :: t
   def built_in("value", key, predicate) do
-    val = fn result ->
-      value = Map.get(result.data, key)
+    val = fn params ->
+      value = Map.get(params, key)
       case Predicate.apply(predicate, value) do
-        :ok -> result
-        {:error, message} -> Result.put_error(result, key, message)
+        :ok -> %{}
+        {:error, message} -> %{key => [message]}
       end
     end
 
@@ -57,12 +56,12 @@ defmodule Validation.Rule do
   """
   @spec built_in(String.t, any) :: t
   def built_in("required", key) do
-    val = fn result ->
-      result.data
+    val = fn params ->
+      params
       |> Map.has_key?(key)
       |> case do
-        true -> result
-        false -> Result.put_error(result, key, "is missing")
+        true -> %{}
+        false -> %{key => ["is missing"]}
       end
     end
 
