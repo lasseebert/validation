@@ -44,10 +44,7 @@ defmodule Validation.Preprocessor do
   @spec combine([t]) :: t
   def combine(preprocessors) do
     val = fn params ->
-      preprocessors
-      |> Enum.reduce(params, fn preprocessor, params ->
-        apply(preprocessor, params)
-      end)
+      Enum.reduce(preprocessors, params, &apply/2)
     end
     build(val, type: "combined", preprocessors: preprocessors)
   end
