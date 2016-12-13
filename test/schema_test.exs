@@ -74,4 +74,18 @@ defmodule Validation.SchemaTest do
     result = Schema.apply(schema, params)
     refute result.valid?
   end
+
+  test "whitelist schema" do
+    rules = [
+      Rule.BuiltIn.value(:name, Predicate.built_in("filled?")),
+      Rule.BuiltIn.value(:email, Predicate.built_in("filled?")),
+    ]
+    schema = Schema.build(rules, whitelist: true)
+
+    assert schema.meta[:preprocessor].meta[:type] == "combined"
+
+    params = %{name: "me", email: "me@example.com", age: 42}
+    result = Schema.apply(schema, params)
+    assert result.data == %{name: "me", email: "me@example.com"}
+  end
 end

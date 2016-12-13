@@ -27,8 +27,12 @@ defmodule Validation.Schema do
   def build(rules, options \\ []) do
     preprocessor = Keyword.get(options, :preprocessor, Preprocessor.identity)
     strict? = Keyword.get(options, :strict, false)
+    whitelist? = Keyword.get(options, :whitelist, false)
 
     rules = if strict?, do: [strict_rule(rules) | rules], else: rules
+    preprocessor = if whitelist?,
+      do: Preprocessor.combine([preprocessor, whitelister(rules)]),
+      else: preprocessor
 
     val = fn params ->
       params = Preprocessor.apply(preprocessor, params)
@@ -52,10 +56,20 @@ defmodule Validation.Schema do
   end
 
   defp strict_rule(rules) do
-    keys =
-      rules
-      |> Enum.filter(&(Keyword.has_key?(&1.meta, :key)))
-      |> Enum.map(&(Keyword.fetch!(&1.meta, :key)))
-    BuiltInRule.strict(keys)
+    rules
+    |> rule_keys
+    |> BuiltInRule.strict
+  end
+
+  defp whitelister(rules) do
+    rules
+    |> rule_keys
+    |> Preprocessor.whitelist
+  end
+
+  defp rule_keys(rules) do
+    rules
+    |> Enum.filter(&(Keyword.has_key?(&1.meta, :key)))
+    |> Enum.map(&(Keyword.fetch!(&1.meta, :key)))
   end
 end

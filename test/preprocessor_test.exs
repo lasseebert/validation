@@ -51,8 +51,8 @@ defmodule Validation.PreprocessorTest do
     assert Preprocessor.apply(identity, params) == params
   end
 
-  test "white_list preprocessor" do
-    white_lister = Preprocessor.white_list([:name, :email])
+  test "whitelist preprocessor" do
+    whitelister = Preprocessor.whitelist([:name, :email])
 
     params = %{
       name: "John",
@@ -60,7 +60,7 @@ defmodule Validation.PreprocessorTest do
       age: 45
     }
 
-    updated_params = Preprocessor.apply(white_lister, params)
+    updated_params = Preprocessor.apply(whitelister, params)
 
     assert updated_params == %{
       name: "John",

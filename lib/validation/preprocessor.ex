@@ -61,14 +61,14 @@ defmodule Validation.Preprocessor do
   @doc """
   A preprocessor that removes all the keys not in the given list
   """
-  @spec white_list([any]) :: t
-  def white_list(keys) do
+  @spec whitelist([any]) :: t
+  def whitelist(keys) do
     val = fn params ->
       params
       |> Enum.filter(fn {key, _value} -> key in keys end)
       |> Enum.into(%{})
     end
 
-    build(val, type: "white_list", keys: keys)
+    build(val, type: "whitelist", keys: keys)
   end
 end
