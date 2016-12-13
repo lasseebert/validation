@@ -7,7 +7,7 @@ defmodule Validation.SchemaTest do
   alias Validation.Schema
 
   def simple_schema do
-    Schema.build([Rule.built_in("value", :name, Predicate.built_in("filled?"))])
+    Schema.build([Rule.BuiltIn.value(:name, Predicate.built_in("filled?"))])
   end
 
   test "simple schema has metadata" do
@@ -42,7 +42,7 @@ defmodule Validation.SchemaTest do
     end)
 
     schema = Schema.build(
-      [Rule.built_in("value", :name, Predicate.built_in("filled?"))],
+      [Rule.BuiltIn.value(:name, Predicate.built_in("filled?"))],
       upcaser
     )
 
