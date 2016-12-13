@@ -33,7 +33,7 @@ defmodule Validation.RuleTest do
     assert errors == %{name: ["must be filled"]}
   end
 
-  test "built_in required rule" do
+  test "built-in required rule" do
     rule = Rule.built_in("required", :name)
 
     errors = Rule.apply(rule, %{name: "Me"})
@@ -41,5 +41,18 @@ defmodule Validation.RuleTest do
 
     errors = Rule.apply(rule, %{})
     assert errors == %{name: ["is missing"]}
+  end
+
+  test "built-in strict rule" do
+    strict_rule = Rule.built_in("strict", [:name, :email])
+
+    assert strict_rule.meta[:type] == "strict"
+    assert strict_rule.meta[:keys] == [:name, :email]
+
+    errors = Rule.apply(strict_rule, %{name: "Me", email: "me@example.com"})
+    assert errors == %{}
+
+    errors = Rule.apply(strict_rule, %{name: "Me", email: "me@example.com", age: 42})
+    assert errors == %{age: ["is not an expected key"]}
   end
 end

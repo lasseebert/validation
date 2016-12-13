@@ -67,4 +67,19 @@ defmodule Validation.Rule do
 
     build(val, [type: "required_key", key: key])
   end
+
+  @doc """
+  Built-in rule that expects only the given keys
+  """
+  @spec built_in(String.t, [any]) :: t
+  def built_in("strict", keys) do
+    val = fn params ->
+      params
+      |> Enum.reject(fn {key, _value} -> key in keys end)
+      |> Enum.map(fn {key, _value} -> {key, ["is not an expected key"]} end)
+      |> Enum.into(%{})
+    end
+
+    build(val, [type: "strict", keys: keys])
+  end
 end
