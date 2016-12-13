@@ -1,9 +1,7 @@
 defmodule Validation.PreprocessorTest do
   use ExUnit.Case, async: true
 
-  alias Validation.Predicate
   alias Validation.Preprocessor
-  alias Validation.Rule
 
   test "building a preprocessor manually" do
     fun = fn params ->
@@ -54,11 +52,7 @@ defmodule Validation.PreprocessorTest do
   end
 
   test "white_list preprocessor" do
-    rules = [
-      Rule.built_in("required", :name),
-      Rule.built_in("value", :email, Predicate.built_in("filled?")),
-    ]
-    white_lister = Preprocessor.white_list(rules)
+    white_lister = Preprocessor.white_list([:name, :email])
 
     params = %{
       name: "John",

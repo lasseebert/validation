@@ -59,22 +59,16 @@ defmodule Validation.Preprocessor do
   end
 
   @doc """
-  A preprocessor that removes all the keys not validated by a rule.
-  Each rule with a :key in the meta is considered
+  A preprocessor that removes all the keys not in the given list
   """
-  @spec white_list([Rule.t]) :: t
-  def white_list(rules) do
-    keys =
-      rules
-      |> Enum.filter(&(Keyword.has_key?(&1.meta, :key)))
-      |> Enum.map(&(Keyword.fetch!(&1.meta, :key)))
-
+  @spec white_list([any]) :: t
+  def white_list(keys) do
     val = fn params ->
       params
       |> Enum.filter(fn {key, _value} -> key in keys end)
       |> Enum.into(%{})
     end
 
-    build(val, type: "white_list", rules: rules)
+    build(val, type: "white_list", keys: keys)
   end
 end
