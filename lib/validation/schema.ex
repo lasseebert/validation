@@ -7,10 +7,13 @@ defmodule Validation.Schema do
   alias Validation.Preprocessor
   alias Validation.Result
   alias Validation.Rule
+  alias Validation.Rule.BuiltIn, as: BuiltInRule
 
-  @type t           :: %__MODULE__{val: schema_fun, meta: meta_data}
+  @type t :: %__MODULE__{val: schema_fun, meta: meta_data}
+  @type options :: [option]
+  @type option :: {:preprocessor, Preprocessor.t} | {:strict, boolean}
   @typep schema_fun :: ((map) -> Result.t)
-  @typep meta_data  :: Keyword.t
+  @typep meta_data :: Keyword.t
 
   defstruct [
     val: nil,
@@ -20,8 +23,13 @@ defmodule Validation.Schema do
   @doc """
   Builds a schema from a list of rules and optionally a preprocessor
   """
-  @spec build([Rule.t], Preprocessor.t) :: t
-  def build(rules, preprocessor \\ Preprocessor.identity) do
+  @spec build([Rule.t], options) :: t
+  def build(rules, options \\ []) do
+    preprocessor = Keyword.get(options, :preprocessor, Preprocessor.identity)
+    strict? = Keyword.get(options, :strict, false)
+
+    rules = if strict?, do: [strict_rule(rules) | rules], else: rules
+
     val = fn params ->
       params = Preprocessor.apply(preprocessor, params)
       result = %Result{data: params}
@@ -41,5 +49,13 @@ defmodule Validation.Schema do
   @spec apply(t, map) :: Result.t
   def apply(%__MODULE__{val: val}, params) do
     val.(params)
+  end
+
+  defp strict_rule(rules) do
+    keys =
+      rules
+      |> Enum.filter(&(Keyword.has_key?(&1.meta, :key)))
+      |> Enum.map(&(Keyword.fetch!(&1.meta, :key)))
+    BuiltInRule.strict(keys)
   end
 end

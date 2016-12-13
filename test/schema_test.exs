@@ -43,7 +43,7 @@ defmodule Validation.SchemaTest do
 
     schema = Schema.build(
       [Rule.BuiltIn.value(:name, Predicate.built_in("filled?"))],
-      upcaser
+      preprocessor: upcaser
     )
 
     params = %{name: "John"}
@@ -54,5 +54,24 @@ defmodule Validation.SchemaTest do
     assert result.errors == %{}
 
     assert schema.meta[:preprocessor] == upcaser
+  end
+
+  test "strict schema" do
+    rules = [
+      Rule.BuiltIn.value(:name, Predicate.built_in("filled?")),
+      Rule.BuiltIn.value(:email, Predicate.built_in("filled?")),
+    ]
+    schema = Schema.build(rules, strict: true)
+
+    assert schema.meta[:rules] |> length == 3
+    assert schema.meta[:rules] |> hd |> Map.get(:meta) |> Keyword.get(:type) == "strict"
+
+    params = %{name: "me", email: "me@example.com"}
+    result = Schema.apply(schema, params)
+    assert result.valid?
+
+    params = %{name: "me", email: "me@example.com", age: 42}
+    result = Schema.apply(schema, params)
+    refute result.valid?
   end
 end
