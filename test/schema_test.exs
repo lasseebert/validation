@@ -11,14 +11,14 @@ defmodule Validation.SchemaTest do
   end
 
   test "simple schema has metadata" do
-    schema = simple_schema
+    schema = simple_schema()
 
     assert [%Rule{}] = schema.meta[:rules]
   end
 
   test "simple schema against invalid data" do
     params = %{name: ""}
-    result = Schema.apply(simple_schema, params)
+    result = Schema.apply(simple_schema(), params)
 
     assert result.valid? == false
     assert result.data == %{name: ""}
@@ -27,7 +27,7 @@ defmodule Validation.SchemaTest do
 
   test "simple schema against valid data" do
     params = %{name: "John"}
-    result = Schema.apply(simple_schema, params)
+    result = Schema.apply(simple_schema(), params)
 
     assert result.valid? == true
     assert result.data == %{name: "John"}
