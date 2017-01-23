@@ -2,12 +2,13 @@ defmodule Validation.SchemaTest do
   use ExUnit.Case, async: true
 
   alias Validation.Predicate
+  alias Validation.Predicates
   alias Validation.Preprocessor
   alias Validation.Rule
   alias Validation.Schema
 
   def simple_schema do
-    Schema.build([Rule.BuiltIn.value(:name, Predicate.built_in("filled?"))])
+    Schema.build([Rule.BuiltIn.value(:name, Predicates.Filled.build())])
   end
 
   test "simple schema has metadata" do
@@ -42,7 +43,7 @@ defmodule Validation.SchemaTest do
     end)
 
     schema = Schema.build(
-      [Rule.BuiltIn.value(:name, Predicate.built_in("filled?"))],
+      [Rule.BuiltIn.value(:name, Predicates.Filled.build())],
       preprocessor: upcaser
     )
 
@@ -58,8 +59,8 @@ defmodule Validation.SchemaTest do
 
   test "strict schema" do
     rules = [
-      Rule.BuiltIn.value(:name, Predicate.built_in("filled?")),
-      Rule.BuiltIn.value(:email, Predicate.built_in("filled?")),
+      Rule.BuiltIn.value(:name, Predicates.Filled.build()),
+      Rule.BuiltIn.value(:email, Predicates.Filled.build()),
     ]
     schema = Schema.build(rules, strict: true)
 
@@ -77,8 +78,8 @@ defmodule Validation.SchemaTest do
 
   test "whitelist schema" do
     rules = [
-      Rule.BuiltIn.value(:name, Predicate.built_in("filled?")),
-      Rule.BuiltIn.value(:email, Predicate.built_in("filled?")),
+      Rule.BuiltIn.value(:name, Predicates.Filled.build()),
+      Rule.BuiltIn.value(:email, Predicates.Filled.build()),
     ]
     schema = Schema.build(rules, whitelist: true)
 

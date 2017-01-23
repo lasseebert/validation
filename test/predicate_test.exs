@@ -39,31 +39,4 @@ defmodule Validation.PredicateTest do
     assert composed.val.(42) == {:error, "must be a string"}
     assert composed.val.("foo") == :ok
   end
-
-  describe "built_in" do
-    test "and" do
-      filled? = Predicate.build_basic(fn value -> !(value in ["", nil]) end, "must be filled", "filled?")
-      string? = Predicate.build_basic(&is_binary/1, "must be a string", "string?")
-
-      composed = Predicate.built_in("and", filled?, string?)
-
-      assert composed.val.("") == {:error, "must be filled"}
-      assert composed.val.(42) == {:error, "must be a string"}
-      assert composed.val.("foo") == :ok
-    end
-
-    test "filled?" do
-      filled? = Predicate.built_in("filled?")
-
-      assert filled?.meta[:name] == "filled?"
-      assert filled?.meta[:type] == "basic"
-
-      assert filled?.val.("something") == :ok
-      assert filled?.val.(42) == :ok
-      assert filled?.val.(nil) == {:error, "must be filled"}
-      assert filled?.val.("") == {:error, "must be filled"}
-      assert filled?.val.([]) == {:error, "must be filled"}
-      assert filled?.val.(%{}) == {:error, "must be filled"}
-    end
-  end
 end
