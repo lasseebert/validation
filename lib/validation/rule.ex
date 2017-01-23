@@ -35,36 +35,59 @@ defmodule Validation.Rule do
     val.(result)
   end
 
-  @doc """
-  Built-in rule that validates a single value by key and a predicate
-  """
-  @spec built_in(String.t, any, Predicate.t) :: t
-  def built_in("value", key, predicate) do
-    val = fn params ->
-      value = Map.get(params, key)
-      case Predicate.apply(predicate, value) do
-        :ok -> %{}
-        {:error, message} -> %{key => [message]}
+  defmodule BuiltIn do
+    alias Validation.Rule
+
+    @moduledoc """
+    Built-in rules
+    """
+
+    @doc """
+    Rule that validates a single value by key and a predicate
+    """
+    @spec value(any, Predicate.t) :: Rule.t
+    def value(key, predicate) do
+      val = fn params ->
+        value = Map.get(params, key)
+        case Predicate.apply(predicate, value) do
+          :ok -> %{}
+          {:error, message} -> %{key => [message]}
+        end
       end
+
+      Rule.build(val, [type: "value", key: key, predicate: predicate])
     end
 
-    build(val, [type: "value", key: key, predicate: predicate])
-  end
-
-  @doc """
-  Build a rule that requires a certain key to be present
-  """
-  @spec built_in(String.t, any) :: t
-  def built_in("required", key) do
-    val = fn params ->
-      params
-      |> Map.has_key?(key)
-      |> case do
-        true -> %{}
-        false -> %{key => ["is missing"]}
+    @doc """
+    Rule that requires a certain key to be present
+    """
+    @spec required_key(any) :: Rule.t
+    def required_key(key) do
+      val = fn params ->
+        params
+        |> Map.has_key?(key)
+        |> case do
+          true -> %{}
+          false -> %{key => ["is missing"]}
+        end
       end
+
+      Rule.build(val, [type: "required_key", key: key])
     end
 
-    build(val, [type: "required_key", key: key])
+    @doc """
+    Rule that expects only the given keys
+    """
+    @spec strict([any]) :: Rule.t
+    def strict(keys) do
+      val = fn params ->
+        params
+        |> Enum.reject(fn {key, _value} -> key in keys end)
+        |> Enum.map(fn {key, _value} -> {key, ["is not an expected key"]} end)
+        |> Enum.into(%{})
+      end
+
+      Rule.build(val, [type: "strict", keys: keys])
+    end
   end
 end

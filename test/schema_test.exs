@@ -7,7 +7,7 @@ defmodule Validation.SchemaTest do
   alias Validation.Schema
 
   def simple_schema do
-    Schema.build([Rule.built_in("value", :name, Predicate.built_in("filled?"))])
+    Schema.build([Rule.BuiltIn.value(:name, Predicate.built_in("filled?"))])
   end
 
   test "simple schema has metadata" do
@@ -42,8 +42,8 @@ defmodule Validation.SchemaTest do
     end)
 
     schema = Schema.build(
-      [Rule.built_in("value", :name, Predicate.built_in("filled?"))],
-      upcaser
+      [Rule.BuiltIn.value(:name, Predicate.built_in("filled?"))],
+      preprocessor: upcaser
     )
 
     params = %{name: "John"}
@@ -54,5 +54,38 @@ defmodule Validation.SchemaTest do
     assert result.errors == %{}
 
     assert schema.meta[:preprocessor] == upcaser
+  end
+
+  test "strict schema" do
+    rules = [
+      Rule.BuiltIn.value(:name, Predicate.built_in("filled?")),
+      Rule.BuiltIn.value(:email, Predicate.built_in("filled?")),
+    ]
+    schema = Schema.build(rules, strict: true)
+
+    assert schema.meta[:rules] |> length == 3
+    assert schema.meta[:rules] |> hd |> Map.get(:meta) |> Keyword.get(:type) == "strict"
+
+    params = %{name: "me", email: "me@example.com"}
+    result = Schema.apply(schema, params)
+    assert result.valid?
+
+    params = %{name: "me", email: "me@example.com", age: 42}
+    result = Schema.apply(schema, params)
+    refute result.valid?
+  end
+
+  test "whitelist schema" do
+    rules = [
+      Rule.BuiltIn.value(:name, Predicate.built_in("filled?")),
+      Rule.BuiltIn.value(:email, Predicate.built_in("filled?")),
+    ]
+    schema = Schema.build(rules, whitelist: true)
+
+    assert schema.meta[:preprocessor].meta[:type] == "combined"
+
+    params = %{name: "me", email: "me@example.com", age: 42}
+    result = Schema.apply(schema, params)
+    assert result.data == %{name: "me", email: "me@example.com"}
   end
 end
