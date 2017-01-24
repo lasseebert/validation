@@ -7,7 +7,7 @@ defmodule Validation.Schema do
   alias Validation.Preprocessor
   alias Validation.Result
   alias Validation.Rule
-  alias Validation.Rule.BuiltIn, as: BuiltInRule
+  alias Validation.Rules.Strict
 
   @type t :: %__MODULE__{val: schema_fun, meta: meta_data}
   @type options :: [option]
@@ -58,7 +58,7 @@ defmodule Validation.Schema do
   defp strict_rule(rules) do
     rules
     |> rule_keys
-    |> BuiltInRule.strict
+    |> Strict.build
   end
 
   defp whitelister(rules) do
