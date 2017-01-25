@@ -48,27 +48,4 @@ defmodule Validation.Preprocessor do
     end
     build(val, type: "combined", preprocessors: preprocessors)
   end
-
-  @doc """
-  The preprocessor that returns the input params untouched.
-  This can be used as a default preprocessor.
-  """
-  @spec identity() :: t
-  def identity do
-    build(&(&1), type: "identity")
-  end
-
-  @doc """
-  A preprocessor that removes all the keys not in the given list
-  """
-  @spec whitelist([any]) :: t
-  def whitelist(keys) do
-    val = fn params ->
-      params
-      |> Enum.filter(fn {key, _value} -> key in keys end)
-      |> Enum.into(%{})
-    end
-
-    build(val, type: "whitelist", keys: keys)
-  end
 end
