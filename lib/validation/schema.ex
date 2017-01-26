@@ -5,6 +5,8 @@ defmodule Validation.Schema do
   """
 
   alias Validation.Preprocessor
+  alias Validation.Preprocessors.Identity
+  alias Validation.Preprocessors.Whitelist
   alias Validation.Result
   alias Validation.Rule
   alias Validation.Rules.Strict
@@ -25,7 +27,7 @@ defmodule Validation.Schema do
   """
   @spec build([Rule.t], options) :: t
   def build(rules, options \\ []) do
-    preprocessor = Keyword.get(options, :preprocessor, Preprocessor.identity)
+    preprocessor = Keyword.get(options, :preprocessor, Identity.build)
     strict? = Keyword.get(options, :strict, false)
     whitelist? = Keyword.get(options, :whitelist, false)
 
@@ -64,7 +66,7 @@ defmodule Validation.Schema do
   defp whitelister(rules) do
     rules
     |> rule_keys
-    |> Preprocessor.whitelist
+    |> Whitelist.build
   end
 
   defp rule_keys(rules) do
