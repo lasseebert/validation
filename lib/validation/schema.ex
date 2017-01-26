@@ -10,6 +10,7 @@ defmodule Validation.Schema do
   alias Validation.Result
   alias Validation.Rule
   alias Validation.Rules.Strict
+  import Kernel, except: [apply: 2]
 
   @type t :: %__MODULE__{val: schema_fun, meta: meta_data}
   @type options :: [option]
@@ -23,10 +24,10 @@ defmodule Validation.Schema do
   ]
 
   @doc """
-  Builds a schema from a list of rules and optionally a preprocessor
+  Builds a schema from a list of rules and nested schemas
   """
-  @spec build([Rule.t], options) :: t
-  def build(rules, options \\ []) do
+  @spec build([Rule.t], nested :: %{optional(any) => t}, options) :: t
+  def build(rules, nested_schemas, options \\ []) do
     preprocessor = Keyword.get(options, :preprocessor, Identity.build)
     strict? = Keyword.get(options, :strict, false)
     whitelist? = Keyword.get(options, :whitelist, false)
@@ -37,12 +38,11 @@ defmodule Validation.Schema do
       else: preprocessor
 
     val = fn params ->
-      params = Preprocessor.apply(preprocessor, params)
-      result = %Result{data: params}
-      Enum.reduce(rules, result, fn rule, result ->
-        errors = Rule.apply(rule, result.data)
-        Result.merge_errors(result, errors)
-      end)
+      params
+      |> apply_preprocessor(preprocessor)
+      |> build_result
+      |> apply_rules(rules)
+      |> apply_nested_schemas(nested_schemas)
     end
 
     %__MODULE__{val: val, meta: [rules: rules, preprocessor: preprocessor]}
@@ -55,6 +55,35 @@ defmodule Validation.Schema do
   @spec apply(t, map) :: Result.t
   def apply(%__MODULE__{val: val}, params) do
     val.(params)
+  end
+
+  defp apply_preprocessor(params, preprocessor) do
+    Preprocessor.apply(preprocessor, params)
+  end
+
+  defp build_result(params) do
+    %Result{data: params}
+  end
+
+  defp apply_rules(result, rules) do
+    Enum.reduce(rules, result, fn rule, result ->
+      errors = Rule.apply(rule, result.data)
+      Result.merge_errors(result, errors)
+    end)
+  end
+
+  defp apply_nested_schemas(result, nested_schemas) do
+    Enum.reduce(nested_schemas, result, fn {key, nested_schema}, result ->
+      result.data
+      |> Map.fetch(key)
+      |> case do
+        {:ok, nested_params} ->
+          nested_result = apply(nested_schema, nested_params)
+          Result.merge_nested(result, nested_result, key)
+        :error ->
+          result
+      end
+    end)
   end
 
   defp strict_rule(rules) do
