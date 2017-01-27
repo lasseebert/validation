@@ -115,4 +115,16 @@ defmodule Validation.SchemaTest do
     assert result.valid? == false
     assert result.errors == %{attrs: %{user: %{name: ["must be filled"]}}}
   end
+
+  test "nested schema when nested value is not a map" do
+    rules = [Rules.Value.build(:name, Predicates.Filled.build())]
+    nested_schema = Schema.build(rules, %{})
+    schema = Schema.build([], %{user: nested_schema})
+
+    params = %{user: "Not a map"}
+    result = Schema.apply(schema, params)
+    assert result.data == %{user: "Not a map"}
+    assert result.valid? == false
+    assert result.errors == %{user: ["is invalid"]}
+  end
 end

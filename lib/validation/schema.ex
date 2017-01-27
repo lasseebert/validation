@@ -77,9 +77,11 @@ defmodule Validation.Schema do
       result.data
       |> Map.fetch(key)
       |> case do
-        {:ok, nested_params} ->
+        {:ok, %{} = nested_params} ->
           nested_result = apply(nested_schema, nested_params)
           Result.merge_nested(result, nested_result, key)
+        {:ok, _not_map} ->
+          Result.merge_errors(result, %{key => ["is invalid"]})
         :error ->
           result
       end
