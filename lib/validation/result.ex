@@ -19,11 +19,11 @@ defmodule Validation.Result do
     }
   end
 
-  @spec merge_errors(t, map) :: t
   @doc """
   Merges the given errors with the errors in the result.
   Returns an updated result
   """
+  @spec merge_errors(t, map) :: t
   def merge_errors(%__MODULE__{} = result, errors) do
     updated_errors = Map.merge(result.errors, errors, fn _key, v1, v2 ->
       Enum.uniq(v1 ++ v2)
@@ -33,5 +33,15 @@ defmodule Validation.Result do
       errors: updated_errors,
       valid?: !Enum.any?(updated_errors)
     }
+  end
+
+  @doc """
+  Merges a nested result with the given key
+  """
+  @spec merge_nested(result :: t, nested :: t, key :: any) :: t
+  def merge_nested(result, nested, key) do
+    data = Map.put(result.data, key, nested.data)
+    errors = Map.put(result.errors, key, nested.errors)
+    %{result | data: data, errors: errors, valid?: result.valid? && nested.valid?}
   end
 end
