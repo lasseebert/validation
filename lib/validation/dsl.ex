@@ -14,6 +14,10 @@ defmodule Validation.DSL do
     end
   end
 
+  def parse_rules({:__block__, _, rules}) when is_list(rules) do
+    rules
+    |> Enum.flat_map(&parse_rules/1)
+  end
   def parse_rules({:required, _, [field, predicate_spec]}) do
     predicate = parse_predicate(predicate_spec)
 

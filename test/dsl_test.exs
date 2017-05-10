@@ -18,8 +18,21 @@ defmodule Validation.DSLTest do
     refute result.valid?
   end
 
-  @tag :skip
-  test "multiple fields"
+  test "multiple fields" do
+    schema = Validation.schema do
+      required(:name, filled?)
+      required(:email, filled?)
+    end
+
+    params = %{name: "John", email: "john@me.com"}
+    result = Schema.apply(schema, params)
+    assert result.valid?
+
+    params = %{name: "John"}
+    result = Schema.apply(schema, params)
+    refute result.valid?
+    assert result.errors == %{email: ["is missing", "must be filled"]}
+  end
 
   @tag :skip
   test "no predicate"
