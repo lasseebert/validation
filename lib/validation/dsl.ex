@@ -18,6 +18,10 @@ defmodule Validation.DSL do
     rules
     |> Enum.flat_map(&parse_rules/1)
   end
+  def parse_rules({:required, _, [field]}) do
+    key_rule = Validation.Rules.RequiredKey.build(field)
+    [key_rule]
+  end
   def parse_rules({:required, _, [field, predicate_spec]}) do
     predicate = parse_predicate(predicate_spec)
 

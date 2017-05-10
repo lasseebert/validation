@@ -34,8 +34,20 @@ defmodule Validation.DSLTest do
     assert result.errors == %{email: ["is missing", "must be filled"]}
   end
 
-  @tag :skip
-  test "no predicate"
+  test "no predicate" do
+    schema = Validation.schema do
+      required(:name)
+    end
+
+    params = %{name: ""}
+    result = Schema.apply(schema, params)
+    assert result.valid?
+
+    params = %{first_name: "John"}
+    result = Schema.apply(schema, params)
+    refute result.valid?
+    assert result.errors == %{name: ["is missing"]}
+  end
 
   @tag :skip
   test "optional field"
