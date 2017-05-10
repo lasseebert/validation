@@ -6,10 +6,10 @@ defmodule Validation do
   @doc """
   Creates a schema using the DSL
   """
-  defmacro schema(schema_spec) do
+  defmacro schema(do: spec) do
+    spec = Macro.escape(spec)
     quote do
-      require Validation.DSL
-      Validation.DSL.build_schema(unquote(schema_spec))
+      Validation.DSL.parse_schema(unquote(spec))
     end
   end
 end

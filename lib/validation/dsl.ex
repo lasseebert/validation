@@ -3,35 +3,39 @@ defmodule Validation.DSL do
   Functions that make it simple to create schemas
   """
 
+  alias Validation.Predicates
+  alias Validation.Rules
+  alias Validation.Schema
+
+  @type schema_ast :: any
+
   @doc """
   Creates a schema from the AST specification
   """
-  defmacro build_schema(do: rule_spec) do
-    rule_spec = Macro.escape(rule_spec)
-    quote do
-      rules = Validation.DSL.parse_rules(unquote(rule_spec))
-      Validation.Schema.build(rules, %{})
-    end
+  @spec parse_schema(schema_ast) :: Schema.t
+  def parse_schema(spec) do
+    rules = parse_rules(spec)
+    Schema.build(rules, %{})
   end
 
-  def parse_rules({:__block__, _, rules}) when is_list(rules) do
+  defp parse_rules({:__block__, _, rules}) when is_list(rules) do
     rules
     |> Enum.flat_map(&parse_rules/1)
   end
-  def parse_rules({:required, _, [field]}) do
-    key_rule = Validation.Rules.RequiredKey.build(field)
+  defp parse_rules({:required, _, [field]}) do
+    key_rule = Rules.RequiredKey.build(field)
     [key_rule]
   end
-  def parse_rules({:required, _, [field, predicate_spec]}) do
+  defp parse_rules({:required, _, [field, predicate_spec]}) do
     predicate = parse_predicate(predicate_spec)
 
-    value_rule = Validation.Rules.Value.build(field, predicate)
-    key_rule = Validation.Rules.RequiredKey.build(field)
+    value_rule = Rules.Value.build(field, predicate)
+    key_rule = Rules.RequiredKey.build(field)
 
     [key_rule, value_rule]
   end
 
   defp parse_predicate({:filled?, _, nil}) do
-    Validation.Predicates.Filled.build
+    Predicates.Filled.build
   end
 end
